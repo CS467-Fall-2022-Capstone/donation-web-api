@@ -17,7 +17,7 @@ app.use(
 
 
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+    res.send('<h1>Donation Web API is running!</h1>');
 });
 
 app.listen(port, () => {
