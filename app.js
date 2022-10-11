@@ -17,7 +17,7 @@ app.use(
 app.get('/', (req, res) => res.type('html').send(html));
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
+    console.log(`Donation Web API listening on port ${port}`);
 });
 
 const html = `
@@ -65,7 +65,7 @@ const html = `
   </head>
   <body>
     <section>
-      Hello from Render!
+    Donation Web API is running!
     </section>
   </body>
 </html>
