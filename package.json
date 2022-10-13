@@ -9,10 +9,12 @@
   },
   "author": "Sean Park, Alice Fisher, Joel Swenddal",
   "license": "MIT",
+  "type": "module",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "lodash": "^4.17.21",
     "mongoose": "^6.6.5"
   },
   "devDependencies": {
