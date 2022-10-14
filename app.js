@@ -1,21 +1,27 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
+'use strict'
+import config from './src/config/config.js';
+import app from './src/express.js';
+import mongoose from 'mongoose';
 
-const port = process.env.PORT || 3000;
+const port = config.port || 3000;
 
-const app = express();
+//setup db
+mongoose.Promise = global.Promise;
 
-app.use(cors());
-app.use(express.json());
-app.use(
-    express.urlencoded({
-        extended: true,
+mongoose.connect(config.mongoUri).then(() => {
+    console.log(`Connected to MongoDb at: ${config.mongoUri}`)
+}).
+    catch(error => {
+        console.error(`Unable to establish connection to database: ${config.mongoUri}`);
     })
-);
 
-app.get('/', (req, res) => res.send('Donation Web API is running on Render'));
+mongoose.connection.on('error', () => {
+    throw new Error(`unable to connect to database: ${config.mongoUri}`);
+})
 
-app.listen(port, () => {
+app.listen(port, (err) => {
+    if (err) {
+        console.log(err)
+    }
     console.log(`Donation Web API listening on port ${port}`);
 });
