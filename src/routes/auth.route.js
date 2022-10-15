@@ -1,6 +1,9 @@
+import express from 'express';
 import passport from 'passport';
 import LocalStrategy from 'passport-local';
+import crypto from 'crypto';
 import Teacher from '../models/teacher.model.js';
+
 
 // store authenticated user into session, if session is not timed out, no need to log in again
 passport.serializeUser(function (user, next) {
