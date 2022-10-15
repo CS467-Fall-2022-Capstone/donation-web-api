@@ -44,7 +44,7 @@ const teacherByID = async (req, res, next, id) => {
     try {
         let teacher = await Teacher.findById(id);
         if (!teacher)
-            return res.status(400).json({
+            return res.status(404).json({
                 error: "Teacher not found"
             })
         req.profile = teacher;
