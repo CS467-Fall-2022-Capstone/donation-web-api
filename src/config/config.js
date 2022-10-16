@@ -1,9 +1,10 @@
 import "dotenv/config.js";
 
 const config = {
-    port: process.env.PORT || 3000,
+    port: process.env.PORT,
     mongoUri: process.env.MONGODB_URI,
-    SESSION_SECRET: process.env.SESSION_SECRET
+    JWT_SECRET: process.env.JWT_SECRET,
+    JWT_ALGO: process.env.JWT_ALGO
 }
 
 export default config;

@@ -1,50 +1,20 @@
 import express from 'express';
-import passport from 'passport';
-import LocalStrategy from 'passport-local';
-import crypto from 'crypto';
-import Teacher from '../models/teacher.model.js';
+import authCtrl from '../controllers/auth.controller.js';
+import { authLocal } from '../services/auth.service.js';
 
+const router = express.Router();
 
-// store authenticated user into session, if session is not timed out, no need to log in again
-passport.serializeUser(function (user, next) {
-    next(null, user.id);
-});
+// Initial Sign Up/Registration Route
+router.route('/signup').post(authCtrl.signUp);
 
-// it will open the session and convert id stored in session into the actual user object, accessible in req.user
-passport.deserializeUser(function (id, next) {
-    User.findbyId(id, function (err, user) {
-        next(err, user);
-    });
-});
+// User Log In Route
+router.route('/login').post(authLocal, authCtrl.login);
 
-// local strategy
-// usernameField and pwField is optional, default is just username and pw. but in this case, we need to redefine to user[email] and user[pw]
-passport.use(
-    new LocalStrategy(
-        {
-            usernameField: 'user[email]',
-            passwordField: 'user[password]',
-            passReqToCallBack: true,
-        },
-        localVerify
-    )
-);
+// Google Login Route
+// Sean TODO: Finalize implementation when Login Screen is done
+// router.route(
+//     '/google',
+//     passport.authenticate('google', { scope: ['profile'] })
+// );
 
-// verify callback for local Strategy
-function localVerify(req, passportEmail, passportPassword, next) {
-    User.findOne({
-        email: passportEmail,
-    }).exec(function (err, foundUser) {
-        if (err) {
-            console.log('err', err);
-            return next(err);
-        } // goes to failureRedirect, which is defined in routes
-
-        if (foundUser.validPassword(passportPassword)) {
-            console.log('success, redirect to /profile');
-            next(null, foundUser); // goes to successRedirect, which is defined in routes
-        }
-    });
-}
-
-module.exports = passport;
+export default router;

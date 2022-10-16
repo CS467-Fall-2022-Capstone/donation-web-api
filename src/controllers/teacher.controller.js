@@ -5,32 +5,6 @@ import errorHandler from '../helpers/dbErrorHandler.js';
 /**
  * Controller functions to be mounted on the Teacher route
  */
-
-/**
- *
- * Create teacher -- Used in the initial signin route
- */
-const create = async (req, res) => {
-    try {
-        const teacher = new Teacher(req.body);
-        teacher.save(function (err) {
-            if (err) {
-                return res.status(400).json({
-                    error: errorHandler.getErrorMessage(err),
-                });
-            } else {
-                return res.status(200).json({
-                    message: 'Successfully signed up!',
-                });
-            }
-        });
-    } catch (err) {
-        return res.status(400).json({
-            error: errorHandler.getErrorMessage(err),
-        });
-    }
-};
-
 const list = async (req, res) => {
     try {
         let teachers = await Teacher.find().select(
@@ -53,7 +27,7 @@ const teacherByID = async (req, res, next, id) => {
     try {
         let teacher = await Teacher.findById(id);
         if (!teacher)
-            return res.status(400).json({
+            return res.status(404).json({
                 error: 'Teacher not found',
             });
         req.profile = teacher;
@@ -64,12 +38,13 @@ const teacherByID = async (req, res, next, id) => {
         });
     }
 };
-const read = (req, res) => {
-    //remove sensitive info from response
-    req.profile.hashed_password = undefined;
-    req.profile.salt = undefined;
-    return res.json(req.profile);
-};
+
+// const read = (req, res) => {
+//     //remove sensitive info from response
+//     req.profile.hashed_password = undefined;
+//     req.profile.salt = undefined;
+//     return res.json(req.profile);
+// };
 
 const update = async (req, res, next) => {
     try {
@@ -104,4 +79,4 @@ const remove = async (req, res, next) => {
     }
 };
 
-export default { create, teacherByID, read, list, remove, update };
+export default { teacherByID, list, remove, update };

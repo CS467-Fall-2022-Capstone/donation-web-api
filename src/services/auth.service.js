@@ -1,47 +1,76 @@
 import passport from 'passport';
 import LocalStrategy from 'passport-local';
 import Teacher from '../models/teacher.model.js';
+import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt';
+import config from '../config/config.js';
 
-// store authenticated user into session, if session is not timed out, no need to log in again
-passport.serializeUser(function (user, next) {
-    next(null, user.id);
+
+// Jwt strategy
+const jwtOpts = {
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: config.JWT_SECRET,
+    algorithms: [config.JWT_ALGO]
+};
+
+const jwtStrategy = new JWTStrategy(jwtOpts, async (jwt_payload, done) => {
+    try {
+        //Identify user by ID
+        const teacher = await Teacher.findById(jwt_payload._id);
+
+        if (!teacher) {
+            return done(null, false);
+        }
+        return done(null, teacher);
+    } catch (e) {
+        return done(e, false);
+    }
 });
 
-// it will open the session and convert id stored in session into the actual user object, accessible in req.user
-passport.deserializeUser(function (id, next) {
-    User.findbyId(id, function (err, user) {
-        next(err, user);
-    });
-});
+// email will be local strategies username
+const localOpts = {
+    usernameField: 'email',
+};
 
-// local strategy
-// usernameField and pwField is optional, default is just username and pw. but in this case, we need to redefine to user[email] and user[pw]
-passport.use(
-    new LocalStrategy(
-        {
-            usernameField: 'user[email]',
-            passwordField: 'user[password]',
-            passReqToCallBack: true,
-        },
-        localVerify
-    )
+const localStrategy = new LocalStrategy(
+    localOpts,
+    async (email, password, done) => {
+        try {
+            const teacher = await Teacher.findOne({
+                email,
+            });
+            if (!teacher) {
+                // Teacher not found
+                return done(null, false);
+            } else if (!teacher.authenticateUser(password)) {
+                // Invalid credentials
+                return done(null, false);
+            }
+            // Teacher found
+            return done(null, user);
+        } catch (e) {
+            return done(e, false);
+        }
+    }
 );
 
-// verify callback for local Strategy
-function localVerify(req, passportEmail, passportPassword, next) {
-    User.findOne({
-        email: passportEmail,
-    }).exec(function (err, foundUser) {
-        if (err) {
-            console.log('err', err);
-            return next(err);
-        } // goes to failureRedirect, which is defined in routes
+// Sean TODO:  Implement Google strategy once login screen is implemented
+// passport.use(new GoogleStrategy({
+//     clientID: config.GOOGLE_CLIENT_ID,
+//     clientSecret: config.GOOGLE_CLIENT_SECRET,
+//     callbackURL: "http://localhost:3000/auth/google/secrets",
+//     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
+//   },
+//   function(accessToken, refreshToken, profile, cb) {
+//     console.log(profile);
 
-        if (foundUser.validPassword(passportPassword)) {
-            console.log('success, redirect to /profile');
-            next(null, foundUser); // goes to successRedirect, which is defined in routes
-        }
-    });
-}
+//     Teacher.findOrCreate({ googleId: profile.id }, function (err, user) {
+//       return cb(err, user);
+//     });
+//   }
+// ));
 
-module.exports = passport;
+passport.use(localStrategy);
+passport.use(jwtStrategy);
+
+export const authLocal = passport.authenticate('local', { session: false });
+export const authJwt = passport.authenticate('jwt', { session: false });

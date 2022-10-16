@@ -1,17 +1,17 @@
 import express from 'express';
 import teacherCtrl from '../controllers/teacher.controller.js';
-//import authCtrl from '../controllers/auth.controller';
+import { authJwt } from '../services/auth.services';
 
 const router = express.Router();
 
-router.route('/api/teachers')
-    .get(teacherCtrl.list)
-    .post(teacherCtrl.create);  //initial signup route
+router
+    .route('/api/teachers')
+    .get(authJwt, teacherCtrl.list);
 
-//NO PROTECTED ROUTES
-router.route('/api/teachers/:teacherId')
-    .get(teacherCtrl.read)
-    .put(teacherCtrl.update)
+//NON PROTECTED ROUTES
+router
+    .route('/api/teachers/:teacherId')
+    .put(authJwt, teacherCtrl.update)
     .delete(teacherCtrl.remove);
 
 /*
