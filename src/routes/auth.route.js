@@ -1,6 +1,6 @@
 import express from 'express';
 import authCtrl from '../controllers/auth.controller.js';
-import { authLocal } from '../services/auth.service.js';
+import { authLocal, authGoogle } from '../services/auth.service.js';
 
 const router = express.Router();
 
@@ -11,10 +11,8 @@ router.route('/signup').post(authCtrl.signUp);
 router.route('/login').post(authLocal, authCtrl.login);
 
 // Google Login Route
-// Sean TODO: Finalize implementation when Login Screen is done
-// router.route(
-//     '/google',
-//     passport.authenticate('google', { scope: ['profile'] })
-// );
+router.route('/google').get(authGoogle);
+
+router.route('/google/callback').get(authGoogle, authCtrl.login);
 
 export default router;

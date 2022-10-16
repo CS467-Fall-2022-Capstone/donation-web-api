@@ -29,9 +29,11 @@ const TeacherSchema = new Schema({
         },
         required: [true, 'Email is required'],
     },
+    google_id: {
+        type: String
+    },
     password: {
         type: String,
-        required: [true, 'Password is required'],
         trim: true,
         minlength: [6, 'Password need to be longer!'],
     },
