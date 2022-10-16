@@ -2,6 +2,7 @@ import passport from 'passport';
 import LocalStrategy from 'passport-local';
 import Teacher from '../models/teacher.model.js';
 import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import config from '../config/config.js';
 
 // Jwt strategy
@@ -52,24 +53,42 @@ const localStrategy = new LocalStrategy(
     }
 );
 
-// Sean TODO:  Implement Google strategy once login screen is implemented
-// passport.use(new GoogleStrategy({
-//     clientID: config.GOOGLE_CLIENT_ID,
-//     clientSecret: config.GOOGLE_CLIENT_SECRET,
-//     callbackURL: "http://localhost:3000/auth/google/secrets",
-//     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
-//   },
-//   function(accessToken, refreshToken, profile, cb) {
-//     console.log(profile);
+const googleStrategy = new GoogleStrategy(
+    {
+        clientID: config.GOOGLE_CLIENTID,
+        clientSecret: config.GOOGLE_SECRET,
+        callbackURL: config.GOOGLE_CALLBACK,
+        passReqToCallback: true,
+    },
+    async (request, accessToken, refreshToken, profile, done) => {
+        try {
+            let teacher = await Teacher.findOne({ google_id: profile.id });
+            if (teacher) {
+                return done(null, teacher);
+            } else {
+                // create Teacher
+                const newTeacher = new Teacher({
+                    google_id: profile.id,
+                    name: profile.displayName,
+                    email: profile.emails[0].value,
+                });
 
-//     Teacher.findOrCreate({ googleId: profile.id }, function (err, user) {
-//       return cb(err, user);
-//     });
-//   }
-// ));
+                await newTeacher.save();
+                return done(null, newTeacher);
+            }
+        } catch (error) {
+            return done(error, false);
+        }
+    }
+);
 
 passport.use(localStrategy);
 passport.use(jwtStrategy);
+passport.use(googleStrategy);
 
 export const authLocal = passport.authenticate('local', { session: false });
 export const authJwt = passport.authenticate('jwt', { session: false });
+export const authGoogle = passport.authenticate('google', {
+    scope: ['profile', 'email'],
+    session: false,
+});
