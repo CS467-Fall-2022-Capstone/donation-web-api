@@ -4,12 +4,11 @@ import Teacher from '../models/teacher.model.js';
 import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt';
 import config from '../config/config.js';
 
-
 // Jwt strategy
 const jwtOpts = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: config.JWT_SECRET,
-    algorithms: [config.JWT_ALGO]
+    algorithms: [config.JWT_ALGO],
 };
 
 const jwtStrategy = new JWTStrategy(jwtOpts, async (jwt_payload, done) => {
@@ -46,7 +45,7 @@ const localStrategy = new LocalStrategy(
                 return done(null, false);
             }
             // Teacher found
-            return done(null, user);
+            return done(null, teacher);
         } catch (e) {
             return done(e, false);
         }

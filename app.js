@@ -17,7 +17,7 @@ if (process.env.NODE_ENV === 'development') {
 //setup db
 mongoose
     .connect(config.mongoUri)
-    .then(console.log(`Connected to DonationDB via ${dbUri}`))  
+    .then(console.log(`Connecting to DonationDB via ${dbUri}`))  
     .catch((error) => console.error(error));
 
 const db = mongoose.connection;

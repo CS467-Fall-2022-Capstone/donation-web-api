@@ -1,12 +1,10 @@
 import express from 'express';
 import teacherCtrl from '../controllers/teacher.controller.js';
-import { authJwt } from '../services/auth.services';
+import { authJwt } from '../services/auth.service.js';
 
 const router = express.Router();
 
-router
-    .route('/api/teachers')
-    .get(authJwt, teacherCtrl.list);
+router.route('/api/teachers').get(authJwt, teacherCtrl.list);
 
 //NON PROTECTED ROUTES
 router

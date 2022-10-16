@@ -1,8 +1,11 @@
 'use strict';
 import config from '../config/config.js';
 import mongoose, { Schema } from 'mongoose';
-import { hashSync, compareSync } from 'bcrypt-nodejs';
+import { hashSync, compareSync } from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import validator from 'validator';
+import uniqueValidator from 'mongoose-unique-validator';
+
 
 /**
  * Teacher schema defined using Mongoose
@@ -32,14 +35,20 @@ const TeacherSchema = new Schema({
         trim: true,
         minlength: [6, 'Password need to be longer!'],
     },
-    supplies: [supplySchema],
-    students: [studentSchema],
+    // TODO: uncomment once supplySchema and studentSchema are defined
+    // supplies: [supplySchema],
+    // students: [studentSchema],
     created: {
         type: Date,
         default: Date.now,
     },
     updated: Date,
 });
+
+// Pre-save to check for unique teacher users
+TeacherSchema.plugin(uniqueValidator, {
+    message: '{VALUE} is already taken!',
+  });
 
 TeacherSchema.pre('save', function (next) {
     if (this.isModified('password')) {
@@ -51,7 +60,7 @@ TeacherSchema.pre('save', function (next) {
 TeacherSchema.methods = {
     // Hash password
     _hashPassword(password) {
-        return hashSync(password);
+        return hashSync(password, 10);
     },
     // Authenticate user by comparing hashed passwords
     authenticateUser(password) {
