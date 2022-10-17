@@ -39,12 +39,12 @@ const teacherByID = async (req, res, next, id) => {
     }
 };
 
-// const read = (req, res) => {
-//     //remove sensitive info from response
-//     req.profile.hashed_password = undefined;
+const read = (req, res) => {
+     //remove sensitive info from response
+     req.profile.password = undefined;
 //     req.profile.salt = undefined;
-//     return res.json(req.profile);
-// };
+     return res.json(req.profile);
+};
 
 const update = async (req, res, next) => {
     try {
@@ -79,4 +79,4 @@ const remove = async (req, res, next) => {
     }
 };
 
-export default { teacherByID, list, remove, update };
+export default { teacherByID, list, remove, update, read };
