@@ -16,6 +16,8 @@ MONGODB_URI=mongodb+srv://<username>:<password>@cluster1.hmltzxa.mongodb.net/Don
 ```
 Replace `<username>` and `<password>` with your database credentials.
 
+Refer to Internal Dev Docs tab in Teams for remaining environment variables needed
+
 Run the server with nodemon
 
 ```
