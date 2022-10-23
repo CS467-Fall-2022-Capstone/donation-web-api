@@ -12,7 +12,7 @@ import errorHandler from '../helpers/dbErrorHandler.js';
     try {
         const teacher = await Teacher.create(req.body);
         // Return to client with teacher data and JWT token
-        return res.status(200).json(teacher.toAuthJSON());
+        return res.status(201).json(teacher.toAuthJSON());
     } catch (err) {
         return res.status(400).json({
             error: errorHandler.getErrorMessage(err),

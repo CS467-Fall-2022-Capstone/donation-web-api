@@ -57,7 +57,7 @@ const update = async (req, res, next) => {
         //remove sensitive info from response
         teacher.hashed_password = undefined;
         teacher.salt = undefined;
-        res.json(teacher);
+        res.status(200).json(teacher.toJSON());
     } catch (err) {
         return res.status(400).json({
             error: errorHandler.getErrorMessage(err),
@@ -69,9 +69,7 @@ const remove = async (req, res, next) => {
     try {
         let teacher = req.profile;
         let deletedTeacher = await teacher.remove();
-        deletedTeacher.hashed_password = undefined;
-        deletedTeacher.salt = undefined;
-        res.json(deletedTeacher);
+        res.status(200).json(deletedTeacher.toJSON());
     } catch (err) {
         return res.status(400).json({
             error: errorHandler.getErrorMessage(err),
