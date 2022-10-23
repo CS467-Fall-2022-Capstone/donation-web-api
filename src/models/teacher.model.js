@@ -6,7 +6,6 @@ import jwt from 'jsonwebtoken';
 import validator from 'validator';
 import uniqueValidator from 'mongoose-unique-validator';
 
-
 /**
  * Teacher schema defined using Mongoose
  */
@@ -30,7 +29,7 @@ const TeacherSchema = new Schema({
         required: [true, 'Email is required'],
     },
     google_id: {
-        type: String
+        type: String,
     },
     password: {
         type: String,
@@ -50,7 +49,7 @@ const TeacherSchema = new Schema({
 // Pre-save to check for unique teacher users
 TeacherSchema.plugin(uniqueValidator, {
     message: '{VALUE} is already taken!',
-  });
+});
 
 TeacherSchema.pre('save', function (next) {
     if (this.isModified('password')) {
@@ -84,6 +83,14 @@ TeacherSchema.methods = {
             email: this.email,
             name: this.name,
             token: `JWT ${this.createToken()}`,
+        };
+    },
+    // Send User Data as Json without token
+    toJSON() {
+        return {
+            _id: this._id,
+            email: this.email,
+            name: this.name,
         };
     },
 };
