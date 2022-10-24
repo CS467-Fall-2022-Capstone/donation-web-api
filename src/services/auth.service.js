@@ -15,7 +15,7 @@ const jwtOpts = {
 const jwtStrategy = new JWTStrategy(jwtOpts, async (jwt_payload, done) => {
     try {
         //Identify user by ID
-        const teacher = await Teacher.findById(jwt_payload._id);
+        const teacher = await Teacher.findById(jwt_payload._id).exec();
 
         if (!teacher) {
             return done(null, false);

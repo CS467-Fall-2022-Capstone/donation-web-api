@@ -41,9 +41,9 @@ const teacherByID = async (req, res, next, id) => {
 
 const read = (req, res) => {
      //remove sensitive info from response
-     req.profile.password = undefined;
-//     req.profile.salt = undefined;
-     return res.json(req.profile);
+     // req.profile.password = undefined;
+     // req.profile.salt = undefined;
+     return res.json(req.profile.toJSON());
 };
 
 const update = async (req, res, next) => {
@@ -54,9 +54,6 @@ const update = async (req, res, next) => {
         teacher = extend(teacher, req.body);
         teacher.updated = Date.now();
         await teacher.save();
-        //remove sensitive info from response
-        teacher.hashed_password = undefined;
-        teacher.salt = undefined;
         res.status(200).json(teacher.toJSON());
     } catch (err) {
         return res.status(400).json({
