@@ -82,7 +82,7 @@ TeacherSchema.methods = {
             _id: this._id,
             email: this.email,
             name: this.name,
-            token: `JWT ${this.createToken()}`,
+            token: `${this.createToken()}`,
         };
     },
     // Send User Data as Json without token
