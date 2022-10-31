@@ -21,7 +21,7 @@ const SupplySchema = new Schema({
     },
     donations: {
         type: Array,
-        required: [true, 'donations array is required']
+        required: [true, 'donations is required']
     },
     created: {
         type: Date,
@@ -35,8 +35,10 @@ SupplySchema.methods = {
     toJSON() {
         return {
             _id: this._id,
-            email: this.item,
-            name: this.totalQuantityNeeded
+            item: this.item,
+            totalQuantityNeeded: this.totalQuantityNeeded,
+            quantityDonated: this.quantityDonated,
+            donations: this.donations
         };
     },
 };
