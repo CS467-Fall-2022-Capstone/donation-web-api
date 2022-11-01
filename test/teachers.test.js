@@ -4,7 +4,7 @@ import setupDb from './testConfig.js';
 import app from '../src/express.js';
 import Teacher from '../src/models/teacher.model.js';
 
-describe('POST: /auth/signup route to insert data and POST: /api/teachers', () => {
+describe('POST: /auth/signup route to insert data and POST: /teachers', () => {
     setupDb(); // setup DB
 
     // create Jane Doe before each test case
@@ -70,7 +70,7 @@ describe('POST: /auth/signup route to insert data and POST: /api/teachers', () =
                 let token = res.body.token;
 
                 request(app)
-                    .get(`/api/teachers/${teacher._id}`)
+                    .get(`/teachers/${teacher._id}`)
                     .set('Authorization', `bearer ${token}`)
                     .then((res) => {
                         expect(res.body).to.have.property('name');
@@ -98,7 +98,7 @@ describe('POST: /auth/signup route to insert data and POST: /api/teachers', () =
                 let token = res.body.token;
 
                 request(app)
-                    .put(`/api/teachers/${teacher._id}`)
+                    .put(`/teachers/${teacher._id}`)
                     .set('Authorization', `bearer ${token}`)
                     .send(newEmail)
                     .then((res) => {
