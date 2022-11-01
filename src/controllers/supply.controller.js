@@ -1,7 +1,7 @@
 import Supply from '../models/supply.model.js';
 import extend from 'lodash/extend.js';
 import errorHandler from '../helpers/dbErrorHandler.js';
-
+import Teacher from '../models/teacher.model.js';
 
 /**
  * Controller functions to be mounted on the Supply route
@@ -29,20 +29,13 @@ const supplyByID = async (req, res, next, id) => {
     }
 };
 
-const create = (req,res) => {
+const create = async (req,res) => {
     try {
-        req.body.donations = [];
-        req.body.quantityDonated = 0;
-        // how do you get teacher_id from Jwt token?
         const supply = await Supply.create(req.body);
-        // add supply to Teacher with teacher_id
-        // get teacher_id from req
-        
-        // get teacher from teacher_id
-
-        // add supply to suppplies array
-
-        // Return to client with Supply data
+        const teacher_id = req.user._id.toString();
+        const teacher = await Teacher.findById(teacher_id);
+        teacher.supplies.push(supply._id);
+        teacher.save();
         return res.status(201).json(supply.toJSON());
     } catch (err) {
         return res.status(400).json({
@@ -52,7 +45,8 @@ const create = (req,res) => {
 };
 
 const read = (req, res) => {
-     return res.json(req.supply.toJSON());
+    console.log(req);
+    return res.json(req.supply.toJSON());
 };
 
 const update = async (req, res, next) => {
@@ -75,7 +69,7 @@ const remove = async (req, res, next) => {
     try {
         let supply = req.supply;
         await supply.remove();
-        res.status(204);
+        return res.status(204).json({'msg': 'supply deleted'});
     } catch (err) {
         return res.status(400).json({
             error: errorHandler.getErrorMessage(err),

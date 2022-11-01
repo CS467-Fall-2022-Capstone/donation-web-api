@@ -36,6 +36,9 @@ const TeacherSchema = new Schema({
         trim: true,
         minlength: [6, 'Password need to be longer!'],
     },
+    supplies: [
+        {type: Schema.Types.ObjectId, ref: 'Supply' }
+    ],
     // TODO: uncomment once supplySchema and studentSchema are defined
     // supplies: [supplySchema],
     // students: [studentSchema],
@@ -91,6 +94,8 @@ TeacherSchema.methods = {
             _id: this._id,
             email: this.email,
             name: this.name,
+            supplies: this.supplies,
+            students: this.students
         };
     },
 };

@@ -1,5 +1,6 @@
 'use strict';
 import mongoose, { Schema } from 'mongoose';
+import jwt_decode from 'jwt-decode';
 
 /**
  * Supply schema defined using Mongoose
@@ -16,13 +17,11 @@ const SupplySchema = new Schema({
         required: [true, 'totalQuantityNeeded is required']
     },
     quantityDonated: {
-        type: Number,
-        required: [true, 'quantityDonated is required']
+        type: Number    
     },
-    donations: {
-        type: Array,
-        required: [true, 'donations is required']
-    },
+    donations: [
+        {type: Schema.Types.ObjectId, ref: 'Donation' }
+    ],
     created: {
         type: Date,
         default: Date.now,

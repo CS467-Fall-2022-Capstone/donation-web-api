@@ -1,12 +1,13 @@
 import express from 'express';
 import supplyCtrl from '../controllers/supply.controller.js';
+import { authJwt } from '../services/auth.service.js';
 
 const router = express.Router();
 
-router.route('/api/supplies').post(supplyCtrl.create);
+router.route('/supplies').post(authJwt, supplyCtrl.create);
 
 router
-    .route('/api/supplies/:supplyId')
+    .route('/supplies/:supplyId')
     .get(supplyCtrl.read)
     .patch(authJwt, supplyCtrl.update)
     .delete(authJwt, supplyCtrl.remove);
