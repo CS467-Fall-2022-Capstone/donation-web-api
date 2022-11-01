@@ -6,9 +6,10 @@ const router = express.Router();
 
 router.route('/teachers').get(authJwt, teacherCtrl.list);
 
+router.route('/teachers/:teacherId/public').get(teacherCtrl.readPublic);
+
 router
     .route('/teachers/:teacherId')
-    .get(teacherCtrl.readPublic)
     .get(authJwt, teacherCtrl.read)
     .put(authJwt, teacherCtrl.update)
     .delete(authJwt, teacherCtrl.remove);
