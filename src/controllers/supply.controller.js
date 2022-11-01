@@ -68,6 +68,14 @@ const update = async (req, res, next) => {
 const remove = async (req, res, next) => {
     try {
         let supply = req.supply;
+        let supply_id = supply._id;
+        const teacher_id = req.user._id.toString();
+        const teacher = await Teacher.findById(teacher_id);
+        let index = teacher.supplies.indexOf(supply_id);
+        if (index > -1) {
+            teacher.supplies.splice(index, 1);
+        }
+        teacher.save();
         await supply.remove();
         return res.status(204).json({'msg': 'supply deleted'});
     } catch (err) {
