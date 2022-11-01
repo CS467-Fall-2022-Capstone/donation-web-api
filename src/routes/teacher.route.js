@@ -4,10 +4,12 @@ import { authJwt } from '../services/auth.service.js';
 
 const router = express.Router();
 
-router.route('/api/teachers').get(authJwt, teacherCtrl.list);
+router.route('/teachers').get(authJwt, teacherCtrl.list);
+
+router.route('/teachers/:teacherId/public').get(teacherCtrl.readPublic);
 
 router
-    .route('/api/teachers/:teacherId')
+    .route('/teachers/:teacherId')
     .get(authJwt, teacherCtrl.read)
     .put(authJwt, teacherCtrl.update)
     .delete(authJwt, teacherCtrl.remove);

@@ -3,6 +3,7 @@ import cors from 'cors';
 import passport from 'passport';
 import authRoutes from './routes/auth.route.js'
 import teacherRoutes from './routes/teacher.route.js';
+import supplyRoutes from './routes/supply.route.js';
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use(passport.initialize());
 //mount routes
 app.use('/auth', authRoutes);
 app.use('/', teacherRoutes);
+app.use('/', supplyRoutes);
 
 
 app.get('/', (req, res) =>

@@ -40,11 +40,21 @@ const teacherByID = async (req, res, next, id) => {
 };
 
 const read = (req, res) => {
-     //remove sensitive info from response
+     //remove sensitive info from response - includes students
      // req.profile.password = undefined;
      // req.profile.salt = undefined;
      return res.json(req.profile.toJSON());
 };
+
+const readPublic = (req, res) => {
+    //remove sensitive info from response - excludes students
+    // req.profile.password = undefined;
+    // req.profile.salt = undefined;
+    // uncomment line below once students are created
+    // req.profile.students = undefined;
+    return res.json(req.profile.toJSON());
+};
+
 
 const update = async (req, res, next) => {
     try {
@@ -74,4 +84,4 @@ const remove = async (req, res, next) => {
     }
 };
 
-export default { teacherByID, list, remove, update, read };
+export default { teacherByID, list, remove, update, read, readPublic };
