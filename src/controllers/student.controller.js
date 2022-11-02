@@ -68,15 +68,11 @@ const update = async (req, res, next) => {
 const remove = async (req, res, next) => {
     try {
         let student = req.student;
-        console.log(student);
         let student_id = student._id;
         // remove student from teacher's students array
         const teacher_id = student.teacher_id;
         const teacher = await Teacher.findById(teacher_id);
-        console.log(teacher);
         let student_index = teacher.students.indexOf(student_id);
-        console.log(student_index);
-        console.log(student_index);
         if (student_index > -1) {
             teacher.students.splice(student_index, 1);
         }
