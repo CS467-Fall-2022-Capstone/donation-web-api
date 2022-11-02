@@ -1,6 +1,5 @@
 'use strict';
 import mongoose, { Schema } from 'mongoose';
-import jwt_decode from 'jwt-decode';
 
 /**
  * Supply schema defined using Mongoose
