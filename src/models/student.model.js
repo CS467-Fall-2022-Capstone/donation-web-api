@@ -1,8 +1,8 @@
 'use strict';
 import mongoose, { Schema } from 'mongoose';
-
+import Donation from '../models/donation.model.js';
 /**
- * Supply schema defined using Mongoose
+ * Student schema defined using Mongoose
  */
 
 const StudentSchema = new Schema({
