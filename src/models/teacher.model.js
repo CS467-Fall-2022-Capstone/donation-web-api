@@ -39,8 +39,9 @@ const TeacherSchema = new Schema({
     supplies: [
         {type: Schema.Types.ObjectId, ref: 'Supply' }
     ],
-    // TODO: uncomment once studentSchema are defined
-    // students: [studentSchema],
+    students: [
+        {type: Schema.Types.ObjectId, ref: 'Student' }
+    ],
     created: {
         type: Date,
         default: Date.now,
