@@ -82,7 +82,7 @@ TeacherSchema.methods = {
     // Send User Data as Json including token
     toAuthJSON() {
         return {
-            _id: this._id,
+            teacher_id: this._id,
             email: this.email,
             name: this.name,
             token: `${this.createToken()}`,
@@ -91,7 +91,7 @@ TeacherSchema.methods = {
     // Send User Data as Json without token
     toJSON() {
         return {
-            _id: this._id,
+            teacher_id: this._id,
             email: this.email,
             name: this.name,
             supplies: this.supplies,

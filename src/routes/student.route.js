@@ -11,7 +11,12 @@ router
     .patch(studentCtrl.update)
     .delete(studentCtrl.remove);
 
-/**
+router
+    .route('/students/:studentId/donations')
+    .get(studentCtrl.readStudentDonations)
+    .patch(studentCtrl.updateStudentDonations);
+
+    /**
  * Preloads user into the Express req object BEFORE
  * propogating to the next function thats specific to the request
  * that came in

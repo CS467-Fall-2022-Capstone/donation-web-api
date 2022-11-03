@@ -17,7 +17,6 @@ const DonationSchema = new Schema({
     },
     item: {
         type: String,
-        required: [true, 'item is required']   
     },
    quantityDonated: {
         type: Number,
@@ -30,4 +29,15 @@ const DonationSchema = new Schema({
     updated: Date,
 });
 
+DonationSchema.methods = {
+    toJSON() {
+        return {
+            donation_id: this._id,
+            supply_id: this.supply_id,
+            student_id: this.student_id,
+            quantityDonated: this.quantityDonated,
+            item: this.item
+        };
+    },
+};
 export default mongoose.model('Donation', DonationSchema);
