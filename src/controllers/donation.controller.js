@@ -4,7 +4,7 @@ import Student from '../models/student.model.js';
 import Supply from '../models/supply.model.js';
 
 /**
- * Controller functions to be mounted on the Student route
+ * Controller functions to be mounted on the Donation route
  */
 
 /**
