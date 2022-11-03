@@ -45,7 +45,6 @@ const create = async (req,res) => {
 };
 
 const read = (req, res) => {
-    console.log(req);
     return res.json(req.supply.toJSON());
 };
 

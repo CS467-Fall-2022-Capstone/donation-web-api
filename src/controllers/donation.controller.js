@@ -23,10 +23,8 @@ import Supply from '../models/supply.model.js';
         let supply_id = donation.supply_id;
         let supply = await Supply.findById(supply_id);
         let item = supply.item;
-        console.log('item ' + item);
         donation.item = item;
         req.donation = donation;
-        console.log(req.donation);
         next();
     } catch (err) {
         return res.status(400).json({
@@ -55,8 +53,6 @@ const create = async (req,res) => {
 };
 
 const read = (req, res) => {
-    console.log('inside read');
-    console.log(req.donation.toJSON());
     return res.json(req.donation.toJSON());
 };
 
