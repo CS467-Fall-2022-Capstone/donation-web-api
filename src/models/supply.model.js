@@ -29,10 +29,9 @@ const SupplySchema = new Schema({
 });
 
 SupplySchema.methods = {
-    // Send User Data as Json without token
     toJSON() {
         return {
-            _id: this._id,
+            supply_id: this._id,
             item: this.item,
             totalQuantityNeeded: this.totalQuantityNeeded,
             quantityDonated: this.quantityDonated,

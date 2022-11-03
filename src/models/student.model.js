@@ -34,10 +34,9 @@ const StudentSchema = new Schema({
 });
 
 StudentSchema.methods = {
-    // Send User Data as Json without token
     toJSON() {
         return {
-            _id: this._id,
+            student_id: this._id,
             firstName: this.firstName,
             lastName: this.lastName,
             email: this.email,
