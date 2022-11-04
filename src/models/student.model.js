@@ -26,11 +26,6 @@ const StudentSchema = new Schema({
     donations: [
         {type: Schema.Types.ObjectId, ref: 'Donation' }
     ],
-    created: {
-        type: Date,
-        default: Date.now,
-    },
-    updated: Date,
 });
 
 StudentSchema.methods = {

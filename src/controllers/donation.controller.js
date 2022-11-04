@@ -35,6 +35,8 @@ import Supply from '../models/supply.model.js';
 
 const create = async (req,res) => {
     try {
+        console.log('inside create donation');
+        console.log(req.body);
         const donation = await Donation.create(req.body);
         const student_id = donation.student_id;
         const student = await Student.findById(student_id);
@@ -43,7 +45,7 @@ const create = async (req,res) => {
         const supply_id = donation.supply_id;
         const supply = await Supply.findById(supply_id);
         supply.donations.push(donation._id);
-        supply.save();
+        supply.save()
         return res.status(201).json(donation.toJSON());
     } catch (err) {
         return res.status(400).json({

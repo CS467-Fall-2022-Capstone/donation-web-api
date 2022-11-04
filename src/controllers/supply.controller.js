@@ -54,7 +54,6 @@ const update = async (req, res, next) => {
         //lodash extend - merges the changes from body with the record
         // from db
         supply = extend(supply, req.body);
-        supply.updated = Date.now();
         await supply.save();
         res.status(200).json(supply.toJSON());
     } catch (err) {
