@@ -71,19 +71,19 @@ const remove = async (req, res, next) => {
         // remove student from teacher's students array
         const teacher_id = student.teacher_id;
         const teacher = await Teacher.findById(teacher_id);
-        let student_index = teacher.students.indexOf(student_id);
+        const student_index = teacher.students.indexOf(student_id);
         if (student_index > -1) {
             teacher.students.splice(student_index, 1);
         }
         await teacher.save();
         // remove student's donations from each Supply that contains 
         // the student's donation
-        let donations = student.donations;
+        const donations = student.donations;
         donations.forEach(async(donation_id) => {
             const donation = await Donation.findById(donation_id);
-            let supply_id = donation.supply_id;
+            const supply_id = donation.supply_id;
             const supply = await Supply.findById(supply_id);
-            let donation_index = supply.donations.indexOf(donation_id);
+            const donation_index = supply.donations.indexOf(donation_id);
             if (donation_index > -1) {
                 supply.donations.splice(donation_index, 1);
             }
@@ -121,8 +121,8 @@ const updateStudentDonations = async (req, res) => {
     const updatedDonations = req.body.updatedDonations; // array of objects {supply_id, quantityDonated}
     let newDonationSupplies = [];
     for( let i=0; i<updatedDonations.length; i++) {
-        let supplyBeingUpdated = updatedDonations[i];
-        let supplyBeingUpdatedId = supplyBeingUpdated.supply_id;
+        const supplyBeingUpdated = updatedDonations[i];
+        const supplyBeingUpdatedId = supplyBeingUpdated.supply_id;
         let donationUpdated = false;
         for (let j=0; j<currDonations.length; j++) {
             const donation_id = currDonations[j];
