@@ -125,9 +125,8 @@ const updateStudentDonations = async (req, res) => {
         let supplyBeingUpdatedId = supplyBeingUpdated.supply_id;
         let donationUpdated = false;
         for (let j=0; j<currDonations.length; j++) {
-            
-            let donation_id = currDonations[j];
-            let donation = await Donation.findById(donation_id);
+            const donation_id = currDonations[j];
+            const donation = await Donation.findById(donation_id);
             if(supplyBeingUpdatedId == donation.supply_id) {
                 donationUpdated = true;
                 donation.quantityDonated = supplyBeingUpdated.quantityDonated;
@@ -165,10 +164,6 @@ const updateStudentDonations = async (req, res) => {
     }));
     expandedDonations = {"donations": expandedDonations};
     return res.json(expandedDonations);
-};
-
-const createDonation = async donationData => {
-
 };
 
 export default { studentByID, create, remove, update, read, readStudentDonations, updateStudentDonations };
