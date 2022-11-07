@@ -43,7 +43,8 @@ const create = async (req,res) => {
         const supply_id = donation.supply_id;
         const supply = await Supply.findById(supply_id);
         supply.donations.push(donation._id);
-        supply.save();
+        supply.quantityDonated += donation.quantityDonated;
+        await supply.save();
         return res.status(201).json(donation.toJSON());
     } catch (err) {
         return res.status(400).json({

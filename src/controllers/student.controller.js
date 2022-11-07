@@ -91,7 +91,7 @@ const remove = async (req, res, next) => {
             await donation.remove();
         });
         await student.remove();
-        return res.status(204).json({'msg': 'student deleted'});
+        return res.status(204).end();
     } catch (err) {
         return res.status(400).json({
             error: errorHandler.getErrorMessage(err),
@@ -117,8 +117,8 @@ const readStudentDonations = async (req, res) => {
 
 const updateStudentDonations = async (req, res) => {
     const student = req.student;
-    const currDonations = student.donations; // array of Donation items {donation_id, student_id, supply_id, quantityDonated}
-    const updatedDonations = req.body.updatedDonations; // array of objects {supply_id, quantityDonated}
+    const currDonations = student.donations; // array of donation_ids
+    const updatedDonations = req.body.updatedDonations; // array of objects representing updated Donations {supply_id, quantityDonated}
     let newDonationSupplies = [];
     for( let i=0; i<updatedDonations.length; i++) {
         const supplyBeingUpdated = updatedDonations[i];
@@ -127,13 +127,19 @@ const updateStudentDonations = async (req, res) => {
         for (let j=0; j<currDonations.length; j++) {
             const donation_id = currDonations[j];
             const donation = await Donation.findById(donation_id);
+            // Donation = {donation_id, student_id, supply_id, quantityDonated}
             if(supplyBeingUpdatedId == donation.supply_id) {
                 donationUpdated = true;
+                let difference = supplyBeingUpdated.quantityDonated - donation.quantityDonated;
                 donation.quantityDonated = supplyBeingUpdated.quantityDonated;
                 await donation.save();
+                // update quantityDonated in Supply object
+                let supply = await Supply.findById(supplyBeingUpdatedId);
+                supply.quantityDonated += difference;
+                await supply.save();
             }
         }
-        // supply not found in student's donations array so create new Donation
+        // supply not found in student's donations array so will create new Donation
         if(!donationUpdated) {
             newDonationSupplies.push(supplyBeingUpdated);
         }
@@ -152,6 +158,7 @@ const updateStudentDonations = async (req, res) => {
         const supply_id = donation.supply_id;
         const supply = await Supply.findById(supply_id);
         supply.donations.push(donation._id);
+        supply.quantityDonated += donation.quantityDonated;
         await supply.save()
     }
     let expandedDonations = await Promise.all(student.donations.map( async (donation_id) => {
