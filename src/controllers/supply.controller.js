@@ -75,7 +75,7 @@ const remove = async (req, res, next) => {
         }
         teacher.save();
         await supply.remove();
-        return res.status(204).json({'msg': 'supply deleted'});
+        return res.status(204).end();
     } catch (err) {
         return res.status(400).json({
             error: errorHandler.getErrorMessage(err),

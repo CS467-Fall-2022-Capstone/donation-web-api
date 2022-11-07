@@ -91,7 +91,7 @@ const remove = async (req, res, next) => {
             await donation.remove();
         });
         await student.remove();
-        return res.status(204).json({'msg': 'student deleted'});
+        return res.status(204).end();
     } catch (err) {
         return res.status(400).json({
             error: errorHandler.getErrorMessage(err),

@@ -75,8 +75,8 @@ const update = async (req, res, next) => {
 const remove = async (req, res, next) => {
     try {
         let teacher = req.profile;
-        let deletedTeacher = await teacher.remove();
-        res.status(200).json(deletedTeacher.toJSON());
+        await teacher.remove();
+        res.status(204).end();
     } catch (err) {
         return res.status(400).json({
             error: errorHandler.getErrorMessage(err),
