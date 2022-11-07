@@ -32,6 +32,8 @@ const supplyByID = async (req, res, next, id) => {
 const create = async (req,res) => {
     try {
         const supply = await Supply.create(req.body);
+        supply.quantityDonated = 0;
+        supply.save();
         const teacher_id = req.user._id.toString();
         const teacher = await Teacher.findById(teacher_id);
         teacher.supplies.push(supply._id);
@@ -50,12 +52,26 @@ const read = (req, res) => {
 
 const update = async (req, res, next) => {
     try {
-        let supply = req.supply;
+        let currSupply = req.supply;
+        let updatedTotalQuantityNeeded = req.body.totalQuantityNeeded;
+        let updatedItem = req.body.item;
+        let updatedSupply = {};
+        // only item and totalQuantityDonated are allowed to be updated
+        if(updatedItem) {
+            updatedSupply.item = updatedItem;
+        }
+        // totalQuantityDonated is not allowed to be a number less than quantityDonated
+        if ( updatedTotalQuantityNeeded) {
+            updatedSupply.totalQuantityNeeded = updatedTotalQuantityNeeded;
+            if( updatedTotalQuantityNeeded < currSupply.supplyDonated) {
+                updatedSupply.totalQuantityNeeded = currSupply.supplyDonated;
+            }
+        }
         //lodash extend - merges the changes from body with the record
         // from db
-        supply = extend(supply, req.body);
-        await supply.save();
-        res.status(200).json(supply.toJSON());
+        currSupply = extend(currSupply, updatedSupply);
+        await currSupply.save();
+        res.status(200).json(currSupply.toJSON());
     } catch (err) {
         return res.status(400).json({
             error: errorHandler.getErrorMessage(err),
