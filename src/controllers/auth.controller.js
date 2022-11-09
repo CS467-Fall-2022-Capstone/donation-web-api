@@ -8,7 +8,7 @@ import errorHandler from '../helpers/dbErrorHandler.js';
  *
  * Register teacher -- Used in the initial sign up route
  */
- const signUp = async (req, res) => {
+const signUp = async (req, res) => {
     try {
         const teacher = await Teacher.create(req.body);
         // Return to client with teacher data and JWT token

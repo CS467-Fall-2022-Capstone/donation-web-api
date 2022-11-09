@@ -11,8 +11,6 @@ router.route('/signup').post(authCtrl.signUp);
 router.route('/login').post(authLocal, authCtrl.login);
 
 // Google Login Route
-router.route('/google').get(authGoogle);
-
-router.route('/google/callback').get(authGoogle, authCtrl.login);
+router.route('/google').post(authGoogle, authCtrl.login);
 
 export default router;
