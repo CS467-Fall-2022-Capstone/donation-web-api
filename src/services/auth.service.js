@@ -2,8 +2,9 @@ import passport from 'passport';
 import LocalStrategy from 'passport-local';
 import Teacher from '../models/teacher.model.js';
 import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt';
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import passportCustom from 'passport-custom';
 import config from '../config/config.js';
+const CustomStrategy = passportCustom.Strategy;
 
 // Jwt strategy
 const jwtOpts = {
@@ -53,34 +54,28 @@ const localStrategy = new LocalStrategy(
     }
 );
 
-const googleStrategy = new GoogleStrategy(
-    {
-        clientID: config.GOOGLE_CLIENTID,
-        clientSecret: config.GOOGLE_SECRET,
-        callbackURL: config.GOOGLE_CALLBACK,
-        passReqToCallback: true,
-    },
-    async (request, accessToken, refreshToken, profile, done) => {
-        try {
-            let teacher = await Teacher.findOne({ google_id: profile.id });
-            if (teacher) {
-                return done(null, teacher);
-            } else {
-                // create Teacher
-                const newTeacher = new Teacher({
-                    google_id: profile.id,
-                    name: profile.displayName,
-                    email: profile.emails[0].value,
-                });
+const googleStrategy = new CustomStrategy(async function (req, done) {
+    try {
+        let teacher = await Teacher.findOne({
+            google_id: req.body.sub,
+        });
+        if (teacher) {
+            return done(null, teacher);
+        } else {
+            // create Teacher
+            const newTeacher = new Teacher({
+                name: req.body.name,
+                email: req.body.email,
+                google_id: req.body.sub,
+            });
 
-                await newTeacher.save();
-                return done(null, newTeacher);
-            }
-        } catch (error) {
-            return done(error, false);
+            await newTeacher.save();
+            return done(null, newTeacher);
         }
+    } catch (error) {
+        return done(error, false);
     }
-);
+});
 
 passport.use(localStrategy);
 passport.use(jwtStrategy);
@@ -88,7 +83,6 @@ passport.use(googleStrategy);
 
 export const authLocal = passport.authenticate('local', { session: false });
 export const authJwt = passport.authenticate('jwt', { session: false });
-export const authGoogle = passport.authenticate('google', {
-    scope: ['profile', 'email'],
+export const authGoogle = passport.authenticate('custom', {
     session: false,
 });
