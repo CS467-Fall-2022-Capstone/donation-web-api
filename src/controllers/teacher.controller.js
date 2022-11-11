@@ -1,6 +1,7 @@
 import Teacher from '../models/teacher.model.js';
 import extend from 'lodash/extend.js';
 import errorHandler from '../helpers/dbErrorHandler.js';
+import Supply from './models/supply.model.js';
 
 /**
  * Controller functions to be mounted on the Teacher route
@@ -40,10 +41,10 @@ const teacherByID = async (req, res, next, id) => {
 };
 
 const read = (req, res) => {
-     //remove sensitive info from response - includes students
-     // req.profile.password = undefined;
-     // req.profile.salt = undefined;
-     return res.json(req.profile.toJSON());
+    //remove sensitive info from response - includes students
+    // req.profile.password = undefined;
+    // req.profile.salt = undefined;
+    return res.json(req.profile.toJSON());
 };
 
 const readPublic = (req, res) => {
@@ -54,7 +55,6 @@ const readPublic = (req, res) => {
     // req.profile.students = undefined;
     return res.json(req.profile.toJSON());
 };
-
 
 const update = async (req, res, next) => {
     try {
@@ -84,4 +84,28 @@ const remove = async (req, res, next) => {
     }
 };
 
-export default { teacherByID, list, remove, update, read, readPublic };
+const getSupplies = async (req, res) => {
+    const teacher = req.profile;
+    const supplyIds = teacher.supplies;
+    try {
+        // Finds all supplies by id in the supplies array
+        const supplies = await Supply.find({
+            _id: { $in: supplyIds },
+        });
+        res.status(200).send(supplies);
+    } catch (err) {
+        return res.status(400).json({
+            error: errorHandler.getErrorMessage(err),
+        });
+    }
+};
+
+export default {
+    teacherByID,
+    list,
+    remove,
+    update,
+    read,
+    readPublic,
+    getSupplies,
+};
