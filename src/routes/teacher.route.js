@@ -14,6 +14,8 @@ router
     .put(authJwt, teacherCtrl.update)
     .delete(authJwt, teacherCtrl.remove);
 
+router.route('/teachers/:teacherId/supplies').get(authJwt, teacherCtrl.getSupplies)
+
 /**
  * Preloads user into the Express req object BEFORE
  * propogating to the next function thats specific to the request
