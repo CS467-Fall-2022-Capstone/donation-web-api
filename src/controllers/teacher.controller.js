@@ -92,7 +92,7 @@ const getSupplies = async (req, res) => {
         const supplies = await Supply.find({
             _id: { $in: supplyIds },
         });
-        res.status(200).send(supplies);
+        res.status(200).json(supplies);
     } catch (err) {
         return res.status(400).json({
             error: errorHandler.getErrorMessage(err),
