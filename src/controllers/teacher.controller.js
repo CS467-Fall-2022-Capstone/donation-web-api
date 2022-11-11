@@ -1,7 +1,7 @@
 import Teacher from '../models/teacher.model.js';
 import extend from 'lodash/extend.js';
 import errorHandler from '../helpers/dbErrorHandler.js';
-import Supply from './models/supply.model.js';
+import Supply from '../models/supply.model.js';
 
 /**
  * Controller functions to be mounted on the Teacher route
