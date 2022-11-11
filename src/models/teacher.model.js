@@ -36,6 +36,14 @@ const TeacherSchema = new Schema({
         trim: true,
         minlength: [6, 'Password need to be longer!'],
     },
+    school: {
+        type: String,
+        default: 'Add your school',
+    },
+    message: {
+        type: String,
+        default: 'Add your message',
+    },
     supplies: [{ type: Schema.Types.ObjectId, ref: 'Supply' }],
     students: [{ type: Schema.Types.ObjectId, ref: 'Student' }],
     created: {
@@ -90,6 +98,8 @@ TeacherSchema.methods = {
             teacher_id: this._id,
             email: this.email,
             name: this.name,
+            school: this.school,
+            message: this.message,
             supplies: this.supplies,
             students: this.students,
         };
