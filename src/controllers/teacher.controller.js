@@ -9,7 +9,7 @@ import Student from '../models/student.model.js';
 const list = async (req, res) => {
     try {
         let teachers = await Teacher.find().select(
-            'name email updated created supplies students'
+            'name email updated created message isPublished supplies students'
         );
         res.json(teachers);
     } catch (err) {
@@ -59,7 +59,8 @@ const read = async (req, res) => {
                 name: teacher.name,
                 email: teacher.email,
                 school: teacher.school,
-                message: teacher.message            
+                message: teacher.message,
+                isPublished: teacher.isPublished            
             },
             supplies,
             students
@@ -85,7 +86,8 @@ const readPublic = async (req, res) => {
                 name: teacher.name,
                 email: teacher.email,
                 school: teacher.school,
-                message: teacher.message               
+                message: teacher.message,
+                isPublished: teacher.isPublished               
             },
             supplies: supplies
         });
@@ -134,7 +136,25 @@ const getSupplies = async (req, res) => {
             _id: { $in: supplyIds },
         });
         res.status(200).json({
-            supplies: supplies
+            supplies
+        });
+    } catch (err) {
+        return res.status(400).json({
+            error: errorHandler.getErrorMessage(err),
+        });
+    }
+};
+
+const getStudents = async (req, res) => {
+    const teacher = req.profile;
+    const studentIds = teacher.students;
+    try {
+        // Finds all sutudents by id in the students array
+        const students = await Student.find({
+            _id: { $in: studentIds },
+        });
+        res.status(200).json({
+            students
         });
     } catch (err) {
         return res.status(400).json({
@@ -150,5 +170,6 @@ export default {
     update,
     read,
     readPublic,
-    getSupplies
+    getSupplies,
+    getStudents
 };

@@ -16,6 +16,8 @@ router
 
 router.route('/teachers/:teacherId/supplies').get(teacherCtrl.getSupplies)
 
+router.route('/teachers/:teacherId/students').get(teacherCtrl.getStudents)
+
 /**
  * Preloads user into the Express req object BEFORE
  * propogating to the next function thats specific to the request
