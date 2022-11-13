@@ -56,8 +56,9 @@ const localStrategy = new LocalStrategy(
 
 const googleStrategy = new CustomStrategy(async function (req, done) {
     try {
+        // Find by email in case user signed up with email/password before signing up with Google
         let teacher = await Teacher.findOne({
-            google_id: req.body.sub,
+            email: req.body.email,
         });
         if (teacher) {
             return done(null, teacher);
