@@ -44,6 +44,10 @@ const TeacherSchema = new Schema({
         type: String,
         default: 'Add your message',
     },
+    isPublished: {
+        type: Boolean,
+        default: false
+    },
     supplies: [{ type: Schema.Types.ObjectId, ref: 'Supply' }],
     students: [{ type: Schema.Types.ObjectId, ref: 'Student' }],
     created: {
@@ -100,6 +104,7 @@ TeacherSchema.methods = {
             name: this.name,
             school: this.school,
             message: this.message,
+            isPublished: this.isPublished,
             supplies: this.supplies,
             students: this.students,
         };
