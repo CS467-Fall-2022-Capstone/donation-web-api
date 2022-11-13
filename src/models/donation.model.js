@@ -15,6 +15,9 @@ const DonationSchema = new Schema({
         type: String,
         required: [true, 'supply_id is required']
     },
+    supplyItem: {
+        type: String
+    },
    quantityDonated: {
         type: Number,
         required: [true,'quantityDonated is required']
@@ -28,6 +31,7 @@ DonationSchema.methods = {
             supply_id: this.supply_id,
             student_id: this.student_id,
             quantityDonated: this.quantityDonated,
+            supplyItem: this.supplyItem
         };
     },
 };

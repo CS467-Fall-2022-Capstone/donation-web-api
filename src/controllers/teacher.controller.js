@@ -3,6 +3,8 @@ import extend from 'lodash/extend.js';
 import errorHandler from '../helpers/dbErrorHandler.js';
 import Supply from '../models/supply.model.js';
 import Student from '../models/student.model.js';
+import Donation from '../models/donation.model.js';
+
 /**
  * Controller functions to be mounted on the Teacher route
  */
@@ -153,6 +155,22 @@ const getStudents = async (req, res) => {
         const students = await Student.find({
             _id: { $in: studentIds },
         });
+        // each student has a donations array - want to return 
+        // an array of the donation objects (not donation_ids)
+        // so the supplyItem and quantityDonated 
+        // can be displayed in the teacher dashboard donors table
+        for( let i=0; i<students.length; i++ ){
+            let donations = students[i].donations;
+            let detailedDonations = [];
+            for( let j=0; j<donations.length; j++) {
+                let donation = await Donation.findById(donations[j]);
+                let supply_id = donation.supply_id;
+                let supplyItem = await Supply.findById(supply_id);
+                donation.supplyItem = supplyItem.item;
+                detailedDonations.push(donation);
+            }
+            students[i].donations = detailedDonations;
+        }
         res.status(200).json({
             students
         });
