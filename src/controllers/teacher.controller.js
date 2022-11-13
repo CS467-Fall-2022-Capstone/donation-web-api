@@ -160,16 +160,16 @@ const getStudents = async (req, res) => {
         // so the supplyItem and quantityDonated 
         // can be displayed in the teacher dashboard donors table
         for( let i=0; i<students.length; i++ ){
+            // donations assigned an array of student's Donation objects
             let donations = students[i].donations;
             let detailedDonations = [];
             for( let j=0; j<donations.length; j++) {
-                let donation = await Donation.findById(donations[j]);
-                let supply_id = donation.supply_id;
-                let supplyItem = await Supply.findById(supply_id);
-                donation.supplyItem = supplyItem.item;
-                detailedDonations.push(donation);
+                let detailedDonation = await Donation.findById(donations[j]).populate('supply_id');
+                console.log(detailedDonation);
+                detailedDonations.push(detailedDonation);
             }
             students[i].donations = detailedDonations;
+            
         }
         res.status(200).json({
             students
