@@ -9,18 +9,13 @@ const SupplySchema = new Schema({
     item: {
         type: String,
         trim: true,
-        required: [true, 'An item is required']
+        required: [true, 'An item is required'],
     },
     totalQuantityNeeded: {
         type: Number,
-        required: [true, 'totalQuantityNeeded is required']
+        required: [true, 'totalQuantityNeeded is required'],
     },
-    quantityDonated: {
-        type: Number    
-    },
-    donations: [
-        {type: Schema.Types.ObjectId, ref: 'Donation' }
-    ]
+    donations: [{ type: Schema.Types.ObjectId, ref: 'Donation' }],
 });
 
 SupplySchema.methods = {
@@ -29,8 +24,7 @@ SupplySchema.methods = {
             supply_id: this._id,
             item: this.item,
             totalQuantityNeeded: this.totalQuantityNeeded,
-            quantityDonated: this.quantityDonated,
-            donations: this.donations
+            donations: this.donations,
         };
     },
 };

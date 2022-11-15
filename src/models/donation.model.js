@@ -32,12 +32,7 @@ DonationSchema.methods = {
             supply_id: this.supply_id,
             student_id: this.student_id,
             quantityDonated: this.quantityDonated,
-            supplyItem: this.getSupplyItem()
         };
-    },
-    async getSupplyItem() {
-        const supply = await Supply.findById(this.supply_id);
-        return supply.item;
     }
 };
 export default mongoose.model('Donation', DonationSchema);
