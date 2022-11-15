@@ -88,7 +88,7 @@ const readPublic = async (req, res) => {
 const update = async (req, res, next) => {
     try {
         let teacher = req.profile;
-        let teacherRecord = await Teacher.findById(teacher._id)
+        let teacherRecord = await Teacher.findById(teacher._id);
         //lodash extend - merges the changes from body with the record
         // from db
         teacherRecord = extend(teacher, req.body);
