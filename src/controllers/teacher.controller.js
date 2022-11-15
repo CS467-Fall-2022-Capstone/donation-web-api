@@ -56,7 +56,6 @@ const read = async (req, res) => {
         const donatedTotals = await Donation.aggregate([
             // Get all donations where the donation.supply_id is in teacher.supplies
             { $match: { supply_id: { $in: teacher.supplies } } },
-            // { $unwind: '$donations' },
             // Group by supply_id and sum up the donation.quantityDonated
             {
                 $group: {
