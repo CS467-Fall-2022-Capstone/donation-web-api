@@ -46,7 +46,7 @@ const TeacherSchema = new Schema({
     },
     isPublished: {
         type: Boolean,
-        default: false
+        default: false,
     },
     supplies: [{ type: Schema.Types.ObjectId, ref: 'Supply' }],
     students: [{ type: Schema.Types.ObjectId, ref: 'Student' }],
@@ -93,6 +93,9 @@ TeacherSchema.methods = {
             teacher_id: this._id,
             email: this.email,
             name: this.name,
+            school: this.school,
+            message: this.message,
+            isPublished: this.isPublished,
             token: `${this.createToken()}`,
         };
     },
