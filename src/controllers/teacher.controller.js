@@ -46,11 +46,43 @@ const teacherByID = async (req, res, next, id) => {
 const read = async (req, res) => {
     const teacher = req.profile;
     try {
+        // return entire lean version of Teacher document with subdoc arrays populated
+        // .lean() converts the MongoDB doc into plain JS object
         const completeTeacherData = await Teacher.findById(teacher._id)
             .populate({ path: 'supplies' })
             .populate({ path: 'students' })
-            .exec();
-        // return entire Teacher document with subdoc arrays populated
+            .lean();
+        // get the total donations for each supply
+        const donatedTotals = await Donation.aggregate([
+            // Get all donations where the donation.supply_id is in teacher.supplies
+            { $match: { supply_id: { $in: teacher.supplies } } },
+            // { $unwind: '$donations' },
+            // Group by supply_id and sum up the donation.quantityDonated
+            {
+                $group: {
+                    _id: '$supply_id',
+                    totalQuantityDonated: { $sum: '$quantityDonated' },
+                },
+            },
+        ]);
+        // // Merge the supplies array with the donated totals array
+        let suppliesWithTotals = donatedTotals.map((donation) => {
+            let supply = completeTeacherData.supplies.find(
+                (supply) => supply._id.toString() === donation._id.toString()
+            );
+            return {
+                ...supply,
+                totalQuantityDonated: donation.totalQuantityDonated,
+            };
+        });
+        completeTeacherData.supplies = suppliesWithTotals;
+        // Add data for Metric Cards
+        let sumDonationQty = 0;
+        suppliesWithTotals.forEach((supply) => {
+            sumDonationQty += supply.totalQuantityDonated;
+        });
+        completeTeacherData.metrics = { sumAllDonations: sumDonationQty, supplyWithDonations: suppliesWithTotals.length}
+        // return completed Teacher data and total donations grouped by supplyId
         res.status(200).json(completeTeacherData);
     } catch (err) {
         return res.status(400).json({
