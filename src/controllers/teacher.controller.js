@@ -49,8 +49,18 @@ const read = async (req, res) => {
         // return entire lean version of Teacher document with subdoc arrays populated
         // .lean() converts the MongoDB doc into plain JS object
         const completeTeacherData = await Teacher.findById(teacher._id)
-            .populate({ path: 'supplies' })
-            .populate({ path: 'students' })
+            .populate('supplies') // get all supply docs
+            .populate({
+                path: 'students', // get all student docs with donations with donated supply
+                populate: {
+                    path: 'donations',
+                    populate: {
+                        // only get the supply name and quantity donated for student's supply
+                        path: 'supply_id',
+                        select: 'item quantityDonated',
+                    },
+                },
+            })
             .lean();
         // get the total donations for each supply
         const donatedTotals = await Donation.aggregate([
@@ -64,23 +74,29 @@ const read = async (req, res) => {
                 },
             },
         ]);
-        // // Merge the supplies array with the donated totals array
-        let suppliesWithTotals = donatedTotals.map((donation) => {
-            let supply = completeTeacherData.supplies.find(
-                (supply) => supply._id.toString() === donation._id.toString()
-            );
-            return {
-                ...supply,
-                totalQuantityDonated: donation.totalQuantityDonated,
-            };
-        });
-        completeTeacherData.supplies = suppliesWithTotals;
-        // Add data for Metric Cards
+        // // Merge the supplies array with the donated totals array and gather metrics
         let sumDonationQty = 0;
-        suppliesWithTotals.forEach((supply) => {
-            sumDonationQty += supply.totalQuantityDonated;
+        let suppliesWithTotals = completeTeacherData.supplies.map((supply) => {
+            let donation = donatedTotals.find(
+                (donation) => donation._id.toString() === supply._id.toString()
+            );
+            if (donation) {
+                // if matching donation found
+                sumDonationQty += donation.totalQuantityDonated;
+                return {
+                    ...supply,
+                    totalQuantityDonated: donation.totalQuantityDonated,
+                };
+            } else {
+                return {...supply, totalQuantityDonated: 0 };
+            }
         });
-        completeTeacherData.metrics = { sumAllDonations: sumDonationQty, supplyWithDonations: suppliesWithTotals.length}
+        // Add stats for metric cards
+        completeTeacherData.supplies = suppliesWithTotals;
+        completeTeacherData.metrics = {
+            sumAllDonations: sumDonationQty,
+            supplyWithDonations: donatedTotals.length,
+        };
         // return completed Teacher data and total donations grouped by supplyId
         res.status(200).json(completeTeacherData);
     } catch (err) {
