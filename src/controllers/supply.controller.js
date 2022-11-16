@@ -52,20 +52,20 @@ const read = (req, res) => {
 const update = async (req, res, next) => {
     try {
         let currSupply = req.supply;
-        let updatedTotalQuantityNeeded = req.body.totalQuantityNeeded;
-        let updatedItem = req.body.item;
-        let updatedSupply = {};
+        // let updatedTotalQuantityNeeded = req.body.totalQuantityNeeded;
+        // let updatedItem = req.body.item;
+        let updatedSupply = req.body;
         // only item and totalQuantityDonated are allowed to be updated
-        if (updatedItem) {
-            updatedSupply.item = updatedItem;
-        }
+        // if (updatedItem) {
+        //     updatedSupply.item = updatedItem;
+        // }
         // totalQuantityDonated is not allowed to be a number less than quantityDonated
-        if (updatedTotalQuantityNeeded) {
-            updatedSupply.totalQuantityNeeded = updatedTotalQuantityNeeded;
-            if (updatedTotalQuantityNeeded < currSupply.supplyDonated) {
-                updatedSupply.totalQuantityNeeded = currSupply.supplyDonated;
-            }
-        }
+        // if (updatedTotalQuantityNeeded) {
+        //     updatedSupply.totalQuantityNeeded = updatedTotalQuantityNeeded;
+        //     if (updatedTotalQuantityNeeded < currSupply.supplyDonated) {
+        //         updatedSupply.totalQuantityNeeded = currSupply.supplyDonated;
+        //     }
+        // }
         //lodash extend - merges the changes from body with the record
         // from db
         currSupply = extend(currSupply, updatedSupply);
@@ -80,9 +80,9 @@ const update = async (req, res, next) => {
 
 const remove = async (req, res, next) => {
     try {
-        const supplyId = req.supply._id
+        const supplyId = req.supply._id;
         const teacher_id = req.user._id.toString();
-        const teacher = await Teacher.findById(teacher_id)
+        const teacher = await Teacher.findById(teacher_id);
         // atomically removes the doc
         teacher.supplies.pull(supplyId);
         await teacher.save();

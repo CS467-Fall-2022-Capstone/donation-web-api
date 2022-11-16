@@ -88,7 +88,7 @@ const read = async (req, res) => {
                     totalQuantityDonated: donation.totalQuantityDonated,
                 };
             } else {
-                return supply;
+                return {...supply, totalQuantityDonated: 0 };
             }
         });
         // Add stats for metric cards
