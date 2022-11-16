@@ -51,10 +51,11 @@ const read = async (req, res) => {
         const completeTeacherData = await Teacher.findById(teacher._id)
             .populate('supplies') // get all supply docs
             .populate({
-                path: 'students',  // get all student docs with donations with donated supply
+                path: 'students', // get all student docs with donations with donated supply
                 populate: {
                     path: 'donations',
-                    populate: {  // only get the supply name and quantity donated for student's supply
+                    populate: {
+                        // only get the supply name and quantity donated for student's supply
                         path: 'supply_id',
                         select: 'item quantityDonated',
                     },
@@ -75,23 +76,26 @@ const read = async (req, res) => {
         ]);
         // // Merge the supplies array with the donated totals array and gather metrics
         let sumDonationQty = 0;
-        let suppliesWithTotals = donatedTotals.map((donation) => {
-            let supply = completeTeacherData.supplies.find(
-                (supply) => supply._id.toString() === donation._id.toString()
+        let suppliesWithTotals = completeTeacherData.supplies.map((supply) => {
+            let donation = donatedTotals.find(
+                (donation) => donation._id.toString() === supply._id.toString()
             );
-            if (supply) {
+            if (donation) {
+                // if matching donation found
                 sumDonationQty += donation.totalQuantityDonated;
+                return {
+                    ...supply,
+                    totalQuantityDonated: donation.totalQuantityDonated,
+                };
+            } else {
+                return supply;
             }
-            return {
-                ...supply,
-                totalQuantityDonated: donation.totalQuantityDonated,
-            };
         });
         // Add stats for metric cards
         completeTeacherData.supplies = suppliesWithTotals;
         completeTeacherData.metrics = {
             sumAllDonations: sumDonationQty,
-            supplyWithDonations: suppliesWithTotals.length,
+            supplyWithDonations: donatedTotals.length,
         };
         // return completed Teacher data and total donations grouped by supplyId
         res.status(200).json(completeTeacherData);
