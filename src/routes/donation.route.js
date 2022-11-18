@@ -3,6 +3,7 @@ import donationCtrl from '../controllers/donation.controller.js';
 
 const router = express.Router();
 
+// SEAN TODO:  Create logic to bulk update and write
 router.route('/donations').post(donationCtrl.create);
 
 router

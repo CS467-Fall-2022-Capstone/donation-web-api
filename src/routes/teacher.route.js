@@ -4,19 +4,18 @@ import { authJwt } from '../services/auth.service.js';
 
 const router = express.Router();
 
+// Auth Route
 router.route('/teachers').get(authJwt, teacherCtrl.list);
 
-router.route('/teachers/:teacherId/public').get(teacherCtrl.readPublic);
-
+// Protected CRUD
 router
     .route('/teachers/:teacherId')
     .get(authJwt, teacherCtrl.read)
     .put(authJwt, teacherCtrl.update)
     .delete(authJwt, teacherCtrl.remove);
 
-router.route('/teachers/:teacherId/supplies').get(teacherCtrl.getSupplies)
-
-router.route('/teachers/:teacherId/students').get(teacherCtrl.getStudents)
+// Public for Donations Page
+router.route('/teachers/:teacherId/public').get(teacherCtrl.readPublic);
 
 /**
  * Preloads user into the Express req object BEFORE
