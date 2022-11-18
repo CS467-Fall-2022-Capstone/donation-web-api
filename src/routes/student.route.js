@@ -11,10 +11,11 @@ router
     .patch(studentCtrl.update)
     .delete(studentCtrl.remove);
 
-router
-    .route('/students/:studentId/donations')
-    .get(studentCtrl.readStudentDonations)
-    .patch(studentCtrl.updateStudentDonations);
+
+// NOTE: Going to use Donation controller to update student donations
+// router
+//     .route('/students/:studentId/donations')
+//     .patch(studentCtrl.updateStudentDonations);
 
     /**
  * Preloads user into the Express req object BEFORE
