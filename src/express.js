@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import passport from 'passport';
-import authRoutes from './routes/auth.route.js'
+import authRoutes from './routes/auth.route.js';
 import teacherRoutes from './routes/teacher.route.js';
 import supplyRoutes from './routes/supply.route.js';
 import studentRoutes from './routes/student.route.js';
@@ -30,13 +30,13 @@ app.use('/', supplyRoutes);
 app.use('/', studentRoutes);
 app.use('/', donationRoutes);
 
-app.get('/', (req, res) => 
+app.get('/', (req, res) =>
     res.status(200).send('Donation Web API is running on Render')
 );
 
 app.get('/ping', (req, res) => {
-    const serverUp = true;
-    res.status(200).send(serverUp);
-})
+    const serverUp = { status: true };
+    res.status(200).json(serverUp);
+});
 
 export default app;
