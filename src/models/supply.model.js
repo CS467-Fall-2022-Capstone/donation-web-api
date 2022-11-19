@@ -21,7 +21,7 @@ const SupplySchema = new Schema({
 SupplySchema.methods = {
     toJSON() {
         return {
-            supply_id: this._id,
+            _id: this._id,
             item: this.item,
             totalQuantityNeeded: this.totalQuantityNeeded,
             donations: this.donations,

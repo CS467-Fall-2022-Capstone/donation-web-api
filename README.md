@@ -15,9 +15,6 @@ PORT=3000  # For local development
 MONGODB_URI=mongodb+srv://<username>:<password>@cluster1.hmltzxa.mongodb.net/DonationDB?retryWrites=true&w=majority
 JWT_SECRET=<Your Secret>
 JWT_ALGO=<Your Algo>
-GOOGLE_CLIENTID=<Google Client ID>  # Must register API via Google
-GOOGLE_SECRET=<Google Secret>  # Must register API via Google
-GOOGLE_CALLBACK=http://localhost:3000/auth/google/callback
 ```
 Replace `<username>` and `<password>` in the `MONGODB_URI` string with your database credentials.
 If you want to use a local version of MongoDB then replaec the string with `mongodb://localhost:27017/<dbname>`
