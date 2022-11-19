@@ -30,8 +30,13 @@ app.use('/', supplyRoutes);
 app.use('/', studentRoutes);
 app.use('/', donationRoutes);
 
-app.get('/', (req, res) =>
+app.get('/', (req, res) => 
     res.status(200).send('Donation Web API is running on Render')
 );
+
+app.get('/ping', (req, res) => {
+    const serverUp = true;
+    res.status(200).send(serverUp);
+})
 
 export default app;
