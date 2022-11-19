@@ -31,13 +31,12 @@ const supplyByID = async (req, res, next, id) => {
 const create = async (req, res) => {
     try {
         const supply = await Supply.create(req.body);
+        console.log(supply);
         const teacher_id = req.user._id.toString();
         const teacher = await Teacher.findById(teacher_id);
         teacher.supplies.push(supply._id);
         await teacher.save();
-        // console.log(supply);
-        // console.log(teacher);
-        return res.status(201).json(supply.toJSON());
+        return res.status(201).json(supply);
     } catch (err) {
         return res.status(400).json({
             error: errorHandler.getErrorMessage(err),
