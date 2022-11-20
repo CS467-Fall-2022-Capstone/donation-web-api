@@ -6,14 +6,18 @@ import nodemailer from 'nodemailer';
 */
 
 const send = async (req, res) => {
+    console.log('inside email send function');
     let transporter = nodemailer.createTransport({
         host: "mail.google.com",
         port: 587,
         secure: false, // true for 465, false for other ports
         auth: {
             user: 'tsdcapstone@gmail.com', 
-            pass: 'tsdcapstone1!', 
+            pass: 'frlnvucfltrtkavq', 
         },
+        tls: {
+            rejectUnauthorized: false
+        }
     });
 
     let mailOptions = {
