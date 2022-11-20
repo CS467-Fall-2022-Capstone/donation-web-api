@@ -13,15 +13,16 @@ router
 
 
 // NOTE: Going to use Donation controller to update student donations
-// router
-//     .route('/students/:studentId/donations')
-//     .patch(studentCtrl.updateStudentDonations);
+router
+    .route('/students/:studentId/donations')
+    .get(studentCtrl.readStudentDonations)
+    .patch(studentCtrl.updateStudentDonations);
 
-    /**
- * Preloads user into the Express req object BEFORE
- * propogating to the next function thats specific to the request
- * that came in
- */
+/**
+* Preloads user into the Express req object BEFORE
+* propogating to the next function thats specific to the request
+* that came in
+*/
 router.param('studentId', studentCtrl.studentByID);
 
 export default router;
