@@ -1,20 +1,40 @@
-/**
- * Controller functions to be mounted on the Email route
- */
+"use strict";
+import nodemailer from 'nodemailer';
 
- const send = async (req, res) => {
-    try {
-        /*
-        const student = await Student.create(req.body);
-        const teacher_id = student.teacher_id;
-        const teacher = await Teacher.findById(teacher_id);
-        teacher.students.push(student._id);
-        teacher.save();
-        return res.status(201).json(student.toJSON());
-        */
-    } catch (err) {
-        return res.status(400).json({
-            error: errorHandler.getErrorMessage(err),
-        });
+/**
+ * Controller function to be mounted on the Email route
+*/
+
+const send = async (req, res) => {
+    let transporter = nodemailer.createTransport({
+        host: "mail.google.com",
+        port: 587,
+        secure: false, // true for 465, false for other ports
+        auth: {
+            user: 'tsdcapstone@gmail.com', 
+            pass: 'tsdcapstone1!', 
+        },
+    });
+
+    let mailOptions = {
+        from: '"TSD" <tsdcapstone@example.com>', // sender address
+        to: "alicefisher100.com", // list of receivers
+        subject: "Hello", // Subject line
+        text: "Hello world?", // plain text body
+        html: "<b>Hello world?</b>", // html body
+    };
+
+    // send mail with defined transport object
+    let info  = await transporter.sendMail(mailOptions);
+
+    
+    if(error) {
+        return console.log(error);
     }
+    console.log('Message sent: %s', info.messageId);
+    return res.status(201);
+
 };
+
+
+export default {send};
