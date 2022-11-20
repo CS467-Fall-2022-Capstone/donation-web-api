@@ -115,85 +115,85 @@ const remove = async (req, res, next) => {
     }
 };
 
-// const readStudentDonations = async (req, res) => {
-//     const student = req.student;
-//     const donations = student.donations;
-//     // when array is sent back, item, quantityDonated is also included for front-end use
-//     let expandedDonations = await Promise.all(
-//         donations.map(async (donation_id) => {
-//             let donationObject = await Donation.findById(donation_id);
-//             return {
-//                 donation_id: donationObject._id,
-//                 item: donationObject.item,
-//                 quantityDonated: donationObject.quantityDonated,
-//             };
-//         })
-//     );
-//     expandedDonations = { donations: expandedDonations };
-//     return res.json(expandedDonations);
-// };
+const readStudentDonations = async (req, res) => {
+     const student = req.student;
+     const donations = student.donations;
+     // when array is sent back, item, quantityDonated is also included for front-end use
+     let expandedDonations = await Promise.all(
+         donations.map(async (donation_id) => {
+             let donationObject = await Donation.findById(donation_id);
+             return {
+                 donation_id: donationObject._id,
+                 item: donationObject.item,
+                 quantityDonated: donationObject.quantityDonated,
+             };
+         })
+     );
+     expandedDonations = { donations: expandedDonations };
+     return res.json(expandedDonations);
+ };
 
-// const updateStudentDonations = async (req, res) => {
-//     const student = req.student;
-//     const currDonations = student.donations; // array of donation_ids
-//     const updatedDonations = req.body.updatedDonations; // array of objects representing updated Donations {supply_id, quantityDonated}
-//     let newDonationSupplies = [];
-//     for (let i = 0; i < updatedDonations.length; i++) {
-//         const supplyBeingUpdated = updatedDonations[i];
-//         const supplyBeingUpdatedId = supplyBeingUpdated.supply_id;
-//         let donationUpdated = false;
-//         for (let j = 0; j < currDonations.length; j++) {
-//             const donation_id = currDonations[j];
-//             const donation = await Donation.findById(donation_id);
-//             // Donation = {donation_id, student_id, supply_id, quantityDonated}
-//             if (supplyBeingUpdatedId == donation.supply_id) {
-//                 donationUpdated = true;
-//                 let difference =
-//                     supplyBeingUpdated.quantityDonated -
-//                     donation.quantityDonated;
-//                 donation.quantityDonated = supplyBeingUpdated.quantityDonated;
-//                 await donation.save();
-//                 // update quantityDonated in Supply object
-//                 let supply = await Supply.findById(supplyBeingUpdatedId);
-//                 supply.quantityDonated += difference;
-//                 await supply.save();
-//             }
-//         }
-//         // supply not found in student's donations array so will create new Donation
-//         if (!donationUpdated) {
-//             newDonationSupplies.push(supplyBeingUpdated);
-//         }
-//     }
-//     for (let i = 0; i < newDonationSupplies.length; i++) {
-//         const newSupplyId = newDonationSupplies[i].supply_id;
-//         const newQuantityDonated = newDonationSupplies[i].quantityDonated;
-//         const donationData = {
-//             student_id: student._id,
-//             supply_id: newSupplyId,
-//             quantityDonated: newQuantityDonated,
-//         };
-//         const donation = await Donation.create(donationData);
-//         student.donations.push(donation._id);
-//         await student.save();
-//         const supply_id = donation.supply_id;
-//         const supply = await Supply.findById(supply_id);
-//         supply.donations.push(donation._id);
-//         supply.quantityDonated += donation.quantityDonated;
-//         await supply.save();
-//     }
-//     let expandedDonations = await Promise.all(
-//         student.donations.map(async (donation_id) => {
-//             let donationObject = await Donation.findById(donation_id);
-//             return {
-//                 donation_id: donationObject._id,
-//                 item: donationObject.item,
-//                 quantityDonated: donationObject.quantityDonated,
-//             };
-//         })
-//     );
-//     expandedDonations = { donations: expandedDonations };
-//     return res.json(expandedDonations);
-// };
+const updateStudentDonations = async (req, res) => {
+     const student = req.student;
+     const currDonations = student.donations; // array of donation_ids
+     const updatedDonations = req.body.updatedDonations; // array of objects representing updated Donations {supply_id, quantityDonated}
+     let newDonationSupplies = [];
+     for (let i = 0; i < updatedDonations.length; i++) {
+         const supplyBeingUpdated = updatedDonations[i];
+         const supplyBeingUpdatedId = supplyBeingUpdated.supply_id;
+         let donationUpdated = false;
+         for (let j = 0; j < currDonations.length; j++) {
+             const donation_id = currDonations[j];
+             const donation = await Donation.findById(donation_id);
+             // Donation = {donation_id, student_id, supply_id, quantityDonated}
+             if (supplyBeingUpdatedId == donation.supply_id) {
+                 donationUpdated = true;
+                 let difference =
+                     supplyBeingUpdated.quantityDonated -
+                     donation.quantityDonated;
+                 donation.quantityDonated = supplyBeingUpdated.quantityDonated;
+                 await donation.save();
+                 // update quantityDonated in Supply object
+                 let supply = await Supply.findById(supplyBeingUpdatedId);
+                 supply.quantityDonated += difference;
+                 await supply.save();
+             }
+         }
+         // supply not found in student's donations array so will create new Donation
+         if (!donationUpdated) {
+             newDonationSupplies.push(supplyBeingUpdated);
+         }
+     }
+     for (let i = 0; i < newDonationSupplies.length; i++) {
+         const newSupplyId = newDonationSupplies[i].supply_id;
+         const newQuantityDonated = newDonationSupplies[i].quantityDonated;
+         const donationData = {
+             student_id: student._id,
+             supply_id: newSupplyId,
+             quantityDonated: newQuantityDonated,
+         };
+         const donation = await Donation.create(donationData);
+         student.donations.push(donation._id);
+         await student.save();
+         const supply_id = donation.supply_id;
+         const supply = await Supply.findById(supply_id);
+         supply.donations.push(donation._id);
+         supply.quantityDonated += donation.quantityDonated;
+         await supply.save();
+     }
+     let expandedDonations = await Promise.all(
+         student.donations.map(async (donation_id) => {
+             let donationObject = await Donation.findById(donation_id);
+             return {
+                 donation_id: donationObject._id,
+                 item: donationObject.item,
+                 quantityDonated: donationObject.quantityDonated,
+             };
+         })
+     );
+     expandedDonations = { donations: expandedDonations };
+     return res.json(expandedDonations);
+     };
 
 export default {
     studentByID,
@@ -201,4 +201,6 @@ export default {
     remove,
     update,
     read,
+    updateStudentDonations,
+    readStudentDonations
 };

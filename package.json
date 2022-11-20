@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "NODE_ENV=development nodemon app.js",
+    "start": "NODE_ENV=development & nodemon app.js",
     "test": "mocha --recursive --exit --timeout 10000"
   },
   "author": "Sean Park, Alice Fisher, Joel Swenddal",
