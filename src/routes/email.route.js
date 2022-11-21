@@ -3,6 +3,6 @@ import emailCtrl from '../controllers/email.controller.js';
 
 const router = express.Router();
 
-router.route('/email').post(emailCtrl.send);
+router.route('/emailDonationId').post(emailCtrl.emailDonationId);
 
 export default router;

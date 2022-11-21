@@ -1,12 +1,17 @@
 import nodemailer from 'nodemailer';
 import smtpTransport from 'nodemailer-smtp-transport';
-
+import Student from '../models/student.model.js';
 /**
  * Controller function to be mounted on the Email route
 */
 
 
-const send = async (req,res) => {
+const emailDonationId = async (req,res) => {
+    let student_email = req.body.email;
+    let teacher_name = req.body.teacher_name;
+    let student = await Student.findOne({email: student_email});
+    let student_id = student._id.toString();
+    let message = `Your Donation ID is ${student_id}. Thank you for your donation.\n${teacher_name}`;
     let transporter = nodemailer.createTransport(smtpTransport({
         service: 'gmail',
         host: 'smtp.gmail.com',
@@ -17,9 +22,9 @@ const send = async (req,res) => {
     }));
     let mailOptions = {
         from: 'tsdcapstone@gmail.com',
-        to: req.body.recipient,
-        subject: req.body.subject,
-        text: req.body.text
+        to: student_email,
+        subject: 'Requested Donation ID',
+        text: message
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
@@ -32,4 +37,4 @@ const send = async (req,res) => {
     })
 };
 
-export default { send };
+export default { emailDonationId };
