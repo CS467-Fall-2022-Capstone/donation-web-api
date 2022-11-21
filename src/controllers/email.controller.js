@@ -7,7 +7,6 @@ import smtpTransport from 'nodemailer-smtp-transport';
 
 
 const send = async (req,res) => {
-    console.log('inside send again');
     let transporter = nodemailer.createTransport(smtpTransport({
         service: 'gmail',
         host: 'smtp.gmail.com',
@@ -16,11 +15,12 @@ const send = async (req,res) => {
             pass: 'frlnvucfltrtkavq'
         }
     }));
+    const message = `Dear ${req.body.student_name},\nThank you for your donation! Your donation ID is ${req.body.student_id}.\nBest,\n${req.body.teacher_name}`;
     let mailOptions = {
         from: 'tsdcapstone@gmail.com',
-        to: 'alicefisher100@gmail.com',
-        subject: 'testing',
-        text: 'test email'
+        to: req.body.recipients,
+        subject: req.body.subject,
+        text: message
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
