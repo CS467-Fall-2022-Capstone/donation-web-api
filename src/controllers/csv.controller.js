@@ -28,27 +28,6 @@ const downloadCsv = async (req,res) => {
     })
     .lean();
 
-/*
-    .select('-google_id -created -updated')
-    .populate('supplies') // get all supply docs
-    .populate({
-        path: 'students', // get all student docs with donations with donated supply
-        select: '-teacher_id',
-        populate: {
-            path: 'donations',
-            select: '-student_id',
-            populate: {
-                // only get the supply name and quantity donated for student's supply
-                path: 'supply_id',
-                select: 'item quantityDonated',
-            },
-        },
-    })
-
-
-*/
-
-    console.log(teacher.students);
     let donorsList = teacher.students.map(student => {
         let formattedStudent = {};
         formattedStudent.student_id = student._id.toString();
@@ -71,13 +50,10 @@ const downloadCsv = async (req,res) => {
  
         // write CSV to a file
         fs.writeFileSync('donorsList.csv', csv);
-        console.log('after writing file');
         res.setHeader('Content-disposition', 'attachment; filename=data.csv');
         res.set('Content-type', 'text/csv');
         res.status(200).send(csv);      
     });
-
 };
-
 
 export default { downloadCsv };
