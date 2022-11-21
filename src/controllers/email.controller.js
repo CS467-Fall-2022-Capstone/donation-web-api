@@ -15,12 +15,11 @@ const send = async (req,res) => {
             pass: 'frlnvucfltrtkavq'
         }
     }));
-    const message = `Dear ${req.body.student_name},\nThank you for your donation! Your donation ID is ${req.body.student_id}.\nBest,\n${req.body.teacher_name}`;
     let mailOptions = {
         from: 'tsdcapstone@gmail.com',
-        to: req.body.recipients,
+        to: req.body.recipient,
         subject: req.body.subject,
-        text: message
+        text: req.body.text
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
