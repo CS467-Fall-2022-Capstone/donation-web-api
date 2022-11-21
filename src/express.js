@@ -6,6 +6,7 @@ import teacherRoutes from './routes/teacher.route.js';
 import supplyRoutes from './routes/supply.route.js';
 import studentRoutes from './routes/student.route.js';
 import donationRoutes from './routes/donation.route.js';
+import csvRoutes from './routes/csv.route.js';
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use('/', teacherRoutes);
 app.use('/', supplyRoutes);
 app.use('/', studentRoutes);
 app.use('/', donationRoutes);
+app.use('/', csvRoutes);
 
 app.get('/', (req, res) =>
     res.status(200).send('Donation Web API is running on Render')
