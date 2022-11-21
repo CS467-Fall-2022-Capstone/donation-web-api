@@ -12,25 +12,65 @@ const downloadCsv = async (req,res) => {
     console.log(teacher_id);
     // first get JSON of data
     let teacher = await Teacher.findById(teacher_id)
-    .select('-google_id -created -updated')
+    .select('students')
     .populate({
         path: 'students', // get all student docs with donations with donated supply
-        //select: '-teacher_id -email -__v -donations'
-        select: '_id firstName lastName donations'
+        select: '-teacher_id',
+        populate: {
+            path: 'donations',
+            select: '-student_id',
+            populate: {
+                // only get the supply name and quantity donated for student's supply
+                path: 'supply_id',
+                select: 'item quantityDonated',
+            },
+        },
     })
     .lean();
+
+/*
+    .select('-google_id -created -updated')
+    .populate('supplies') // get all supply docs
+    .populate({
+        path: 'students', // get all student docs with donations with donated supply
+        select: '-teacher_id',
+        populate: {
+            path: 'donations',
+            select: '-student_id',
+            populate: {
+                // only get the supply name and quantity donated for student's supply
+                path: 'supply_id',
+                select: 'item quantityDonated',
+            },
+        },
+    })
+
+
+*/
+
     console.log(teacher.students);
-    // [{id:1, first_name: 'Annie', last_name: 'Zhu'}, {id:2, first_name: 'Chris', last_name: 'Shu'}];
-    // then convert json to csv file
-    converter.json2csv(teacher.students, (err, csv) => {
+    let donorsList = teacher.students.map(student => {
+        let formattedStudent = {};
+        formattedStudent.student_id = student._id.toString();
+        formattedStudent.firstName = student.firstName;
+        formattedStudent.lastName = student.lastName;
+        formattedStudent.donations = [];
+        student.donations.forEach(donation => {
+            let item = donation.supply_id.item;
+            let quantityDonated = donation.quantityDonated;
+            let donationMade = `${item} - ${quantityDonated}`;
+            formattedStudent.donations.push(donationMade);
+        });
+        return formattedStudent;
+    })
+    //then convert json to csv file
+    converter.json2csv(donorsList, (err, csv) => {
         if (err) {
             throw err;
         }
-        // print CSV string
-        console.log(csv);
-  
+ 
         // write CSV to a file
-        fs.writeFileSync('todos.csv', csv);
+        fs.writeFileSync('donorsList.csv', csv);
         console.log('after writing file');
         res.setHeader('Content-disposition', 'attachment; filename=data.csv');
         res.set('Content-type', 'text/csv');
