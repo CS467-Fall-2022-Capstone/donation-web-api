@@ -37,7 +37,7 @@ const create = async (req, res) => {
         const teacher = await Teacher.findById(teacher_id);
         teacher.students.push(student._id);
         teacher.save();
-        return res.status(201).json(student.toJSON());
+        return res.status(201).json(student);
     } catch (err) {
         return res.status(400).json({
             error: errorHandler.getErrorMessage(err),
@@ -87,25 +87,9 @@ const remove = async (req, res, next) => {
         // remove student from teacher's students array
         const teacher_id = student.teacher_id;
         const teacher = await Teacher.findById(teacher_id);
-        const student_index = teacher.students.indexOf(student_id);
-        if (student_index > -1) {
-            teacher.students.splice(student_index, 1);
-        }
+        teacher.students.pull(student_id);
         await teacher.save();
-        // remove student's donations from each Supply that contains
-        // the student's donation
-        const donations = student.donations;
-        donations.forEach(async (donation_id) => {
-            const donation = await Donation.findById(donation_id);
-            const supply_id = donation.supply_id;
-            const supply = await Supply.findById(supply_id);
-            const donation_index = supply.donations.indexOf(donation_id);
-            if (donation_index > -1) {
-                supply.donations.splice(donation_index, 1);
-            }
-            await supply.save();
-            await donation.remove();
-        });
+        await Donation.deleteMany({student_id: student_id});
         await student.remove();
         return res.status(204).end();
     } catch (err) {
@@ -115,92 +99,26 @@ const remove = async (req, res, next) => {
     }
 };
 
-const readStudentDonations = async (req, res) => {
-     const student = req.student;
-     const donations = student.donations;
-     // when array is sent back, item, quantityDonated is also included for front-end use
-     let expandedDonations = await Promise.all(
-         donations.map(async (donation_id) => {
-             let donationObject = await Donation.findById(donation_id);
-             return {
-                 donation_id: donationObject._id,
-                 item: donationObject.item,
-                 quantityDonated: donationObject.quantityDonated,
-             };
-         })
-     );
-     expandedDonations = { donations: expandedDonations };
-     return res.json(expandedDonations);
- };
-
-const updateStudentDonations = async (req, res) => {
-     const student = req.student;
-     const currDonations = student.donations; // array of donation_ids
-     const updatedDonations = req.body.updatedDonations; // array of objects representing updated Donations {supply_id, quantityDonated}
-     let newDonationSupplies = [];
-     for (let i = 0; i < updatedDonations.length; i++) {
-         const supplyBeingUpdated = updatedDonations[i];
-         const supplyBeingUpdatedId = supplyBeingUpdated.supply_id;
-         let donationUpdated = false;
-         for (let j = 0; j < currDonations.length; j++) {
-             const donation_id = currDonations[j];
-             const donation = await Donation.findById(donation_id);
-             // Donation = {donation_id, student_id, supply_id, quantityDonated}
-             if (supplyBeingUpdatedId == donation.supply_id) {
-                 donationUpdated = true;
-                 let difference =
-                     supplyBeingUpdated.quantityDonated -
-                     donation.quantityDonated;
-                 donation.quantityDonated = supplyBeingUpdated.quantityDonated;
-                 await donation.save();
-                 // update quantityDonated in Supply object
-                 let supply = await Supply.findById(supplyBeingUpdatedId);
-                 supply.quantityDonated += difference;
-                 await supply.save();
-             }
-         }
-         // supply not found in student's donations array so will create new Donation
-         if (!donationUpdated) {
-             newDonationSupplies.push(supplyBeingUpdated);
-         }
-     }
-     for (let i = 0; i < newDonationSupplies.length; i++) {
-         const newSupplyId = newDonationSupplies[i].supply_id;
-         const newQuantityDonated = newDonationSupplies[i].quantityDonated;
-         const donationData = {
-             student_id: student._id,
-             supply_id: newSupplyId,
-             quantityDonated: newQuantityDonated,
-         };
-         const donation = await Donation.create(donationData);
-         student.donations.push(donation._id);
-         await student.save();
-         const supply_id = donation.supply_id;
-         const supply = await Supply.findById(supply_id);
-         supply.donations.push(donation._id);
-         supply.quantityDonated += donation.quantityDonated;
-         await supply.save();
-     }
-     let expandedDonations = await Promise.all(
-         student.donations.map(async (donation_id) => {
-             let donationObject = await Donation.findById(donation_id);
-             return {
-                 donation_id: donationObject._id,
-                 item: donationObject.item,
-                 quantityDonated: donationObject.quantityDonated,
-             };
-         })
-     );
-     expandedDonations = { donations: expandedDonations };
-     return res.json(expandedDonations);
-     };
+const studentByDonationCode = async (req, res) => {
+    // find Student by donation code
+    const donationCode = req.params.donationCode;
+    const student = await Student.findOne({
+        donation_code: donationCode,
+    }).exec();
+    if (student) {
+        return res.status(200).json({ student_id: student._id });
+    } else {
+        return res.status(400).json({
+            error: errorHandler.getErrorMessage(err),
+        });
+    }
+};
 
 export default {
     studentByID,
+    studentByDonationCode,
     create,
     remove,
     update,
     read,
-    updateStudentDonations,
-    readStudentDonations
 };

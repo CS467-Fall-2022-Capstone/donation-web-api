@@ -11,12 +11,10 @@ router
     .patch(studentCtrl.update)
     .delete(studentCtrl.remove);
 
-
-// NOTE: Going to use Donation controller to update student donations
+// Find student by donation code entered in modal form
 router
-    .route('/students/:studentId/donations')
-    .get(studentCtrl.readStudentDonations)
-    .patch(studentCtrl.updateStudentDonations);
+    .route('/students/:donationCode/donations')
+    .get(studentCtrl.studentByDonationCode)
 
 /**
 * Preloads user into the Express req object BEFORE
