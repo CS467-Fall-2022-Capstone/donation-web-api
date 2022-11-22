@@ -17,7 +17,7 @@ const emailDonationId = async (req,res) => {
         host: 'smtp.gmail.com',
         auth: {
             user: 'tsdcapstone@gmail.com',
-            pass: 'frlnvucfltrtkavq'
+            pass: process.env.TSD_EMAIL_PASS
         }
     }));
     let mailOptions = {
