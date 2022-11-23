@@ -7,80 +7,131 @@ import Teacher from '../models/teacher.model.js';
 /**
  * Controller functions to be mounted on the Donation route
  */
-
 const bulkWriteDonations = async (req, res) => {
     const student_id = req.params.studentId;
     const donations = req.body;
-    const donationBulkOperations = donations.map(createBulkWriteOperation);
-    const filteredBulkOperations = donationBulkOperations.filter(
+    const donationsToRemove = donations.map(filterDonationPull); // array of donation objectIds
+    const filteredDonationsToRemove = donationsToRemove.filter(
+        (id) => id !== undefined
+    );
+    // Remove existing donations from arrays if there are any updated to 0
+    if (donationsToRemove.length > 0) {
+        // Remove the donations from student.donations[]
+        await Student.findByIdAndUpdate(
+            student_id,
+            {
+                $pull: { donations: { $in: filteredDonationsToRemove } },
+            },
+            { new: true }
+        ).exec();
+        // Find all the donations to remove from supplies
+        const donationsWithSupplyId = await Donation.find({
+            _id: { $in: filteredDonationsToRemove },
+        }).exec();
+        // Create updateOne operations for the Supplies in donation.supply_id
+        const pullDonationOps = donationsWithSupplyId.map((item) => {
+            if (item) {
+                let updateOneOp = {
+                    updateOne: {
+                        filter: { _id: item.supply_id },
+                        update: { $pull: { donations: item._id } },
+                    },
+                };
+                return updateOneOp;
+            }
+        });
+        // Remove the donations from supplies.donations[]
+        const removalUpdates = await Supply.bulkWrite(pullDonationOps);
+        console.log(
+            `${removalUpdates.modifiedCount} / ${pullDonationOps.length} supplies with donation removed`
+        );
+        // Set all the removed donations supply_id and student_id to null so they don't
+        // populate in supply.donations[] and student.donations[] queries
+        const result = await Donation.updateMany(
+            { _id: { $in: filteredDonationsToRemove } },
+            { student_id: null, supply_id: null }
+        );
+        console.log(`${result.modifiedCount} donations removed from metrics`);
+    }
+    // Create or Update donations
+    const donationsToWrite = donations.map(filterDonationOps); // array of donations to create or update
+    const filteredDonationsToWrite = donationsToWrite.filter(
         (item) => item !== undefined
     );
-    const results = await Donation.bulkWrite(filteredBulkOperations);
-    // returns an array of ids that were inserted after the bulkWrite
-    const newDonations = results.getInsertedIds();
+    const donationBulkOperations = filteredDonationsToWrite.map(
+        createBulkWriteOperation
+    ); // array of insertOne and updateOne operations
+    const result = await Donation.bulkWrite(donationBulkOperations);
+    const newDonations = result.getInsertedIds();
     if (newDonations.length > 0) {
-        // push the new donation ids to Student.donations and Supply.donations
-        const student = await Student.findByIdAndUpdate(
+        const newDonationIds = newDonations.map((donation) => {
+            if (donation) {
+                return donation._id;
+            }
+        });
+        await Student.findByIdAndUpdate(
             student_id,
-            { $push: { donations: { $each: newDonations } } },
+            { $push: { donations: { $each: newDonationIds } } },
             { new: true }
-        );
-        const bulkUpdateOps = await addDonationToSupplies(newDonations);
+        ).exec();
+        // const bulkUpdateOps = addDonationToSupplies(newDonationIds);
+        const donationsWithSupplyId = await Donation.find({
+            _id: { $in: newDonationIds },
+        }).exec();
+        // Create updateOne operations for the Supplies in donation.supply_id
+        const supplyUpdates = donationsWithSupplyId.map((item) => {
+            if (item) {
+                let updateOp = {
+                    updateOne: {
+                        filter: { _id: item.supply_id },
+                        update: { $push: { donations: item._id } },
+                    },
+                };
+                return updateOp;
+            }
+        });
         // Insert all new donations into the supplys.donation array
-        const supplyUpdates = await Supply.bulkWrite(bulkUpdateOps);
+        const updateResults = await Supply.bulkWrite(supplyUpdates);
         console.log(
-            `${supplyUpdates.modifiedCount} / ${bulkUpdateOps.length} supplies updated`
+            `${updateResults.modifiedCount} / ${supplyUpdates.length} supplies updated`
         );
     }
-    return res.status(200).send('Success');
+    return res.status(200).send('bulkWrite successful');
 };
 
-const addDonationToSupplies = async (donations) => {
-    // Find all the new donations
-    const donationsWithSupplyId = await Donation.find({
-        _id: { $in: donations },
-    });
-    // Create updateOne operations for the Supplies in donation.supply_id
-    const supplyUpdates = donationsWithSupplyId.map((item) => {
-        return {
-            updateOne: {
-                filter: { _id: item.supply_id },
-                update: { $push: { donations: item._id } },
-            },
-        };
-    });
-    return supplyUpdates;
+const filterDonationPull = (item) => {
+    if (item.update && item.donationFields.quantityDonated == 0) {
+        // if its existing donation and the student set it to 0, then set for removal from supply
+        return item.donationFields.donation_id;
+    }
+};
+
+const filterDonationOps = (item) => {
+    if (!item.update && item.donationFields.quantityDonated > 0) {
+        return item;
+    } else if (item.update && item.donationFields.quantityDonated > 0) {
+        return item;
+    }
 };
 
 const createBulkWriteOperation = (item) => {
-    if (item.update) {
+    if (item.update === true) {
         // donation exists
-        if (item.donationFields.quantityDonated === 0) {
-            // if its existing donation and the student set it to 0, then remove the donation
-            return {
-                deleteOne: { filter: item.donationFields.donation_id },
-            };
-        } else {
-            // quantityDonated > 0 so update
-            return {
-                updateOne: {
-                    filter: { _id: item.donationFields.donation_id },
-                    update: {
-                        quantityDonated: item.donationFields.quantityDonated,
-                    },
+        return {
+            updateOne: {
+                filter: { _id: item.donationFields.donation_id },
+                update: {
+                    quantityDonated: item.donationFields.quantityDonated,
                 },
-            };
-        }
+            },
+        };
     } else {
         // item.update is false so its a new donation, create insertOne operation
-        // only create a new donation for items where the student inputted a non-zero value
-        if (item.donationFields.quantityDonated > 0) {
-            return {
-                insertOne: {
-                    document: { ...item.donationFields },
-                },
-            };
-        }
+        return {
+            insertOne: {
+                document: { ...item.donationFields },
+            },
+        };
     }
 };
 
@@ -89,7 +140,7 @@ const createBulkWriteOperation = (item) => {
  * propogating to the next function thats specific to the request
  * that came in
  */
- const donationByID = async (req, res, next, id) => {
+const donationByID = async (req, res, next, id) => {
     console.log(req.id);
     try {
         let donation = await Donation.findById(id);
@@ -111,7 +162,7 @@ const createBulkWriteOperation = (item) => {
     }
 };
 
-const create = async (req,res) => {
+const create = async (req, res) => {
     console.log('inside create');
     try {
         console.log(req.body);
@@ -123,7 +174,7 @@ const create = async (req,res) => {
         const donationBody = {
             student_id,
             supply_id,
-            quantityDonated: req.body.quantityDonated
+            quantityDonated: req.body.quantityDonated,
         };
         console.log(donationBody);
         const donation = await Donation.create(donationBody);
@@ -133,8 +184,6 @@ const create = async (req,res) => {
         await student.save();
         supply.donations.push(donation._id);
         await supply.save();
-
-
 
         return res.status(201).json(donation.toJSON());
     } catch (err) {
