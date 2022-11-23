@@ -10,8 +10,7 @@ const emailDonationId = async (req,res) => {
     let student_email = req.body.email;
     let teacher_name = req.body.teacher_name;
     let student = await Student.findOne({email: student_email});
-    let student_id = student._id.toString();
-    let message = `Your Donation ID is ${student_id}. Thank you for your donation.\n${teacher_name}`;
+    let message = `Your Donation Code is ${student.donation_code}. Thank you for your donation.\n${teacher_name}`;
     let transporter = nodemailer.createTransport(smtpTransport({
         service: 'gmail',
         host: 'smtp.gmail.com',
