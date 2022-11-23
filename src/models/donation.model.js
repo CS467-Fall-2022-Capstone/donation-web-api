@@ -1,6 +1,6 @@
 'use strict';
 import mongoose, { Schema } from 'mongoose';
-import Supply from './supply.model.js';
+
 /**
  * Donation schema defined using Mongoose
  */
