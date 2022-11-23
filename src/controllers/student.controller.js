@@ -89,7 +89,7 @@ const remove = async (req, res, next) => {
         const teacher = await Teacher.findById(teacher_id);
         teacher.students.pull(student_id);
         await teacher.save();
-        await Donation.deleteMany({student_id: student_id});
+        await Donation.deleteMany({ student_id: student_id });
         await student.remove();
         return res.status(204).end();
     } catch (err) {
