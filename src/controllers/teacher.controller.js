@@ -109,32 +109,9 @@ const read = async (req, res, next) => {
         // return completed Teacher data and total donations grouped by supplyId
         res.status(200).json(completeTeacherData);
     } catch (err) {
-        if (err.name == 'TokenExpiredError') {
-            const dateTime = new Date(err.expiredAt);
-            const utcDateTime = dateTime.toLocaleString('en-US', {
-                timeZone: 'UTC',
-            });
-            const pstDateTime = dateTime.toLocaleString('en-US', {
-                timeZone: 'America/Los_Angeles',
-            });
-            const estDateTime = dateTime.toLocaleString('en-US', {
-                timeZone: 'America/New_York',
-            });
-
-            return res.status(403).json({
-                name: err.name,
-                message: err.message,
-                expiredAt: {
-                    UTC: utcDateTime,
-                    PST: pstDateTime,
-                    EST: estDateTime,
-                },
-            });
-        } else {
-            return res.status(400).json({
-                error: errorHandler.getErrorMessage(err),
-            });
-        }
+        return res.status(400).json({
+            error: errorHandler.getErrorMessage(err),
+        });
     }
 };
 
