@@ -203,7 +203,6 @@ const remove = async (req, res, next) => {
 };
 
 const setArchive = async (req, res) => {
-    console.log(req.profile);
     const teacherId = req.params.teacherId;
     // setArchive = { isArchived: true }
     const setArchive = req.body;
@@ -223,30 +222,42 @@ const setArchive = async (req, res) => {
 };
 
 const getArchive = async (req, res) => {
-    const supplies = req.profile.supplies;
     try {
-        // return only archived data
-        const archivedSupplies = await Supply.aggregate([
-            // Get all donations where the donation.supply_id is in teacher.supplies
-            {
-                $match: {
-                    _id: { $in: supplies },
-                    isArchived: true,
-                },
-            },
-            {
-                $unwind: {
-                    path: '$donations',
-                    preserveNullAndEmptyArrays: true,
-                },
-            },
-            // Group by id
-            {
-                $group: {
-                    _id: '$_id',
-                },
-            },
-        ]);
+        const archivedData = await Teacher.findById(req.profile._id)
+            .populate({
+                path: 'supplies',
+                match: { isArchived: true },
+                populate: { path: 'donations', match: { isArchived: true } },
+            })
+            .populate({
+                path: 'students',
+                populate: { path: 'donations', match: { isArchived: true } },
+            })
+            .lean();
+        let archivedSupplies = archivedData.supplies.map((supply) => {
+            let formattedDonations = [];
+            supply.donations.forEach((donation) => {
+                if (donation.supply_id.toString() === supply._id.toString()) {
+                    const students = archivedData.students;
+                    let student = students.find(
+                        (student) =>
+                            student._id.toString() ===
+                            donation.student_id.toString()
+                    );
+                    if (student) {
+                        formattedDonations.push(
+                            `${student.firstName} ${student.lastName} - ${donation.quantityDonated}`
+                        );
+                    }
+                }
+            });
+            return {
+                _id: supply._id,
+                item: supply.item,
+                totalQuantityNeeded: supply.totalQuantityNeeded,
+                archivedDonations: formattedDonations,
+            };
+        });
         res.status(200).json(archivedSupplies);
     } catch (err) {
         return res.status(400).json({

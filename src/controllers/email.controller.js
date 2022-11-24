@@ -2,9 +2,15 @@ import nodemailer from 'nodemailer';
 import smtpTransport from 'nodemailer-smtp-transport';
 import Student from '../models/student.model.js';
 import ejs from 'ejs';
+import path from 'path';
+const __dirname = path.dirname(
+    '/Users/seanypark/Desktop/Development/capstone/donation-web-api/src/views'
+);
 
 // Renders HTML with EJS
 const sendHTMLEmail = (
+    req,
+    res,
     recipient,
     subject,
     htmlContent,
@@ -25,7 +31,7 @@ const sendHTMLEmail = (
 
     // Render and send email
     ejs.renderFile(
-        path.join(__dirname, `${template}Template.ejs`),
+        path.join(__dirname, `views/${template}Template.ejs`),
         { recipient, htmlContent },
         (err, data) => {
             // data is the html
@@ -41,7 +47,7 @@ const sendHTMLEmail = (
                     attachments: [
                         {
                             filename: 'TSDlogo-transparent.png',
-                            path: __dirname + 'TSDlogo-transparent.png',
+                            path: __dirname + '/views/TSDlogo-transparent.png',
                             cid: 'logo',
                         },
                     ],
@@ -75,10 +81,18 @@ const emailDonationId = async (req, res) => {
         teacher_name: teacher_name,
         plainTextMessage: message,
         student: student,
-        donationUrl: donationUrl,
+        donationUrl: req.body.donationUrl,
     };
     // Send email as templated HTML and plain text
-    sendHTMLEmail(student_email, subject, htmlContent, message, 'donationId');
+    sendHTMLEmail(
+        req,
+        res,
+        student_email,
+        subject,
+        htmlContent,
+        message,
+        'donationId'
+    );
 };
 
 const emailAfterSubmitDonation = async (req, res) => {
@@ -106,10 +120,31 @@ const emailAfterSubmitDonation = async (req, res) => {
     ${teacher_name}`;
 
     const subject = 'Donation confirmation';
-    const htmlContent = {
-        ...req.body,
+    let transporter = nodemailer.createTransport(
+        smtpTransport({
+            service: 'gmail',
+            host: 'smtp.gmail.com',
+            auth: {
+                user: 'tsdcapstone@gmail.com',
+                pass: process.env.TSD_EMAIL_PASS,
+            },
+        })
+    );
+    let mailOptions = {
+        from: 'tsdcapstone@gmail.com',
+        to: student_email,
+        subject: subject,
+        text: message,
     };
-    sendHTMLEmail(student_email, subject, htmlContent, message, 'donations');
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+            res.sendStatus(200);
+        }
+    });
 };
 
 export default { emailDonationId, emailAfterSubmitDonation };
