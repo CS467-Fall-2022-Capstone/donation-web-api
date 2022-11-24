@@ -2,6 +2,7 @@ import Teacher from '../models/teacher.model.js';
 import extend from 'lodash/extend.js';
 import errorHandler from '../helpers/dbErrorHandler.js';
 import Donation from '../models/donation.model.js';
+import Supply from '../models/supply.model.js';
 
 /**
  * Controller functions to be mounted on the Teacher route
@@ -41,19 +42,20 @@ const teacherByID = async (req, res, next, id) => {
     }
 };
 
-const read = async (req, res) => {
+const read = async (req, res, next) => {
     const teacher = req.profile;
     try {
         // return entire lean version of Teacher document with subdoc arrays populated
         // .lean() converts the MongoDB doc into plain JS object
         const completeTeacherData = await Teacher.findById(teacher._id)
             .select('-google_id -created -updated')
-            .populate('supplies') // get all supply docs
+            .populate({ path: 'supplies', match: { isArchived: false } }) // get all supply docs that aren't archived
             .populate({
                 path: 'students', // get all student docs with donations with donated supply
                 select: '-teacher_id',
                 populate: {
                     path: 'donations',
+                    match: { isArchived: false },
                     select: '-student_id',
                     populate: {
                         // only get the supply name and quantity donated for student's supply
@@ -67,7 +69,12 @@ const read = async (req, res) => {
         // get the total donations for each supply
         const donatedTotals = await Donation.aggregate([
             // Get all donations where the donation.supply_id is in teacher.supplies
-            { $match: { supply_id: { $in: teacher.supplies } } },
+            {
+                $match: {
+                    supply_id: { $in: teacher.supplies },
+                    isArchived: false,
+                },
+            },
             // Group by supply_id and sum up the donation.quantityDonated
             {
                 $group: {
@@ -114,13 +121,18 @@ const readPublic = async (req, res) => {
         // Get Teacher data excluding email, google_id, password, students, and create/updated dates
         const completeTeacherData = await Teacher.findById(teacher._id)
             .select('-email -google_id -password -students -created -updated')
-            .populate('supplies') // supplies with donations unpopulated
+            .populate({ path: 'supplies', match: { isArchived: false } }) // supplies with donations unpopulated
             .lean(); // transform MongoDB into plain JS object
 
         // get the total donations for each supply
         const donatedTotals = await Donation.aggregate([
             // Get all donations where the donation.supply_id is in teacher.supplies
-            { $match: { supply_id: { $in: teacher.supplies } } },
+            {
+                $match: {
+                    supply_id: { $in: teacher.supplies },
+                    isArchived: false,
+                },
+            },
             // Group by supply_id and sum up the donation.quantityDonated
             {
                 $group: {
@@ -190,6 +202,59 @@ const remove = async (req, res, next) => {
     }
 };
 
+const setArchive = async (req, res) => {
+    console.log(req.profile);
+    const teacherId = req.params.teacherId;
+    // setArchive = { isArchived: true }
+    const setArchive = req.body;
+    try {
+        const teacher = await Teacher.findById(teacherId).exec();
+        const supplies = teacher.supplies;
+        // archive Donations that match supply id array
+        await Donation.updateMany({ supply_id: { $in: supplies } }, setArchive);
+        // archive Supplies
+        await Supply.updateMany({ _id: { $in: supplies } }, setArchive);
+        res.status(200).send('Supplies and Donations successfully archived');
+    } catch (err) {
+        return res.status(400).json({
+            error: errorHandler.getErrorMessage(err),
+        });
+    }
+};
+
+const getArchive = async (req, res) => {
+    const supplies = req.profile.supplies;
+    try {
+        // return only archived data
+        const archivedSupplies = await Supply.aggregate([
+            // Get all donations where the donation.supply_id is in teacher.supplies
+            {
+                $match: {
+                    _id: { $in: supplies },
+                    isArchived: true,
+                },
+            },
+            {
+                $unwind: {
+                    path: '$donations',
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            // Group by id
+            {
+                $group: {
+                    _id: '$_id',
+                },
+            },
+        ]);
+        res.status(200).json(archivedSupplies);
+    } catch (err) {
+        return res.status(400).json({
+            error: errorHandler.getErrorMessage(err),
+        });
+    }
+};
+
 export default {
     teacherByID,
     list,
@@ -197,4 +262,6 @@ export default {
     update,
     read,
     readPublic,
+    setArchive,
+    getArchive,
 };

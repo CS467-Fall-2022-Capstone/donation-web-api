@@ -9,19 +9,23 @@ const DonationSchema = new Schema({
     student_id: {
         type: String,
         trim: true,
-        required: [true, 'student_id is required']
+        required: [true, 'student_id is required'],
     },
     supply_id: {
-        type: Schema.Types.ObjectId, 
+        type: Schema.Types.ObjectId,
         ref: 'Supply',
-        required: [true, 'supply_id is required']
+        required: [true, 'supply_id is required'],
     },
     supplyItem: {
-        type: String
+        type: String,
     },
-   quantityDonated: {
+    quantityDonated: {
         type: Number,
-        required: [true,'quantityDonated is required']
+        required: [true, 'quantityDonated is required'],
+    },
+    isArchived: {
+        type: Boolean,
+        default: false,
     },
 });
 
@@ -32,7 +36,8 @@ DonationSchema.methods = {
             supply_id: this.supply_id,
             student_id: this.student_id,
             quantityDonated: this.quantityDonated,
+            isArchived: this.isArchived,
         };
-    }
+    },
 };
 export default mongoose.model('Donation', DonationSchema);

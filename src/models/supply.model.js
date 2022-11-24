@@ -16,10 +16,10 @@ const SupplySchema = new Schema({
         required: [true, 'totalQuantityNeeded is required'],
     },
     donations: [{ type: Schema.Types.ObjectId, ref: 'Donation' }],
-    // isArchived: {
-    //     type: Boolean,
-
-    // }
+    isArchived: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 SupplySchema.methods = {
@@ -29,7 +29,7 @@ SupplySchema.methods = {
             item: this.item,
             totalQuantityNeeded: this.totalQuantityNeeded,
             donations: this.donations,
-            // isArchived: this.isArchived
+            isArchived: this.isArchived,
         };
     },
 };
