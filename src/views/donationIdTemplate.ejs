@@ -1,16 +1,17 @@
-<%- include('./header.ejs') %>
+<%- include('header.ejs') %>
 
 <div class="container">
-    <img class="logo" src="cid:logo" />
-    <p>Your Donation Code is <%= htmlContent.student.donation_code %>.</p>
+    <div class="sticky-top"><img class="logo" src="cid:logo" /></div>
+
+    <p class=".fs-3">Your Donation Code is <%= htmlContent.student.donation_code %>.</p>
     <a
         class="btn btn-primary"
         href="<%= htmlContent.donationUrl %>"
         role="button"
         >Go to Donation Page</a
     >
-    <p>Thank you for your donation.</p>
-    <p><%= htmlContent.teacher_name %></p>
+    <p class=".fs-3">Thank you for your donation.</p>
+    <p class=".fs-3"><%= htmlContent.teacher_name %></p>
 </div>
 
 <%- include('footer.ejs') %>
