@@ -14,6 +14,12 @@ router
     .patch(authJwt, teacherCtrl.update)
     .delete(authJwt, teacherCtrl.remove);
 
+// Protected Archived Routes
+router
+    .route('/teachers/:teacherId/archive')
+    .get(authJwt, teacherCtrl.getArchive)
+    .patch(authJwt, teacherCtrl.setArchive);
+
 // Public for Donations Page
 router.route('/teachers/:teacherId/public').get(teacherCtrl.readPublic);
 

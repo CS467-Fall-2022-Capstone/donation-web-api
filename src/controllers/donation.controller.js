@@ -49,7 +49,7 @@ const bulkWriteDonations = async (req, res) => {
         // populate in supply.donations[] and student.donations[] queries
         const result = await Donation.updateMany(
             { _id: { $in: filteredDonationsToRemove } },
-            { student_id: null, supply_id: null }
+            { student_id: null, supply_id: null, quantityDonated: 0 }
         );
         console.log(`${result.modifiedCount} donations removed from metrics`);
     }

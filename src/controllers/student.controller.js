@@ -72,7 +72,7 @@ const update = async (req, res, next) => {
         // from db
         student = extend(student, req.body);
         await student.save();
-        res.status(200).json(student.toJSON());
+        res.status(200).json(student);
     } catch (err) {
         return res.status(400).json({
             error: errorHandler.getErrorMessage(err),

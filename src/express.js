@@ -7,8 +7,16 @@ import supplyRoutes from './routes/supply.route.js';
 import studentRoutes from './routes/student.route.js';
 import donationRoutes from './routes/donation.route.js';
 import emailRoutes from './routes/email.route.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const app = express();
+
+// view engine setup for html email templates
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
 app.use(express.json());
 app.use(
