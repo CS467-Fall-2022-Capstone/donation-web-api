@@ -98,7 +98,7 @@ describe('POST: /auth/signup route to insert data and POST: /teachers', () => {
                 let token = res.body.token;
 
                 request(app)
-                    .put(`/teachers/${teacher._id}`)
+                    .patch(`/teachers/${teacher._id}`)
                     .set('Authorization', `bearer ${token}`)
                     .send(newEmail)
                     .then((res) => {
