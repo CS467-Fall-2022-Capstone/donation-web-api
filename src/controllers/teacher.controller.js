@@ -49,9 +49,12 @@ const read = async (req, res, next) => {
         // .lean() converts the MongoDB doc into plain JS object
         const completeTeacherData = await Teacher.findById(teacher._id)
             .select('-google_id -created -updated')
-            .populate({ path: 'supplies', match: { isArchived: false } }) // get all supply docs that aren't archived
+            .populate({ path: 'supplies', 
+                        options: { sort: { 'item': 1 } },
+                        match: { isArchived: false } }) // get all supply docs that aren't archived
             .populate({
                 path: 'students', // get all student docs with donations with donated supply
+                options: { sort: { 'lastName': 1 } },
                 select: '-teacher_id',
                 populate: {
                     path: 'donations',
@@ -107,6 +110,7 @@ const read = async (req, res, next) => {
             supplyWithDonations: donatedTotals.length,
         };
         // return completed Teacher data and total donations grouped by supplyId
+        console.log(completeTeacherData);
         res.status(200).json(completeTeacherData);
     } catch (err) {
         return res.status(400).json({
@@ -121,7 +125,9 @@ const readPublic = async (req, res) => {
         // Get Teacher data excluding email, google_id, password, students, and create/updated dates
         const completeTeacherData = await Teacher.findById(teacher._id)
             .select('-email -google_id -password -students -created -updated')
-            .populate({ path: 'supplies', match: { isArchived: false } }) // supplies with donations unpopulated
+            .populate({ path: 'supplies', 
+                        options: { sort: { 'item': 1 } },
+                        match: { isArchived: false } }) // supplies with donations unpopulated
             .lean(); // transform MongoDB into plain JS object
 
         // get the total donations for each supply
