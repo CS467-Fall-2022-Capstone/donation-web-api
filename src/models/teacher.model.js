@@ -84,7 +84,8 @@ TeacherSchema.methods = {
             {
                 _id: this._id,
             },
-            config.JWT_SECRET
+            config.JWT_SECRET,
+            { expiresIn: '2h' } // expires in 2 hours from issued time (iat)
         );
     },
     // Send User Data as Json including token
