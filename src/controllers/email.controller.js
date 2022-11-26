@@ -15,12 +15,12 @@ const emailDonationId = async (req,res) => {
         service: 'gmail',
         host: 'smtp.gmail.com',
         auth: {
-            user: 'tsdcapstone@gmail.com',
+            user: process.env.TSD_EMAIL_ADDRESS,
             pass: process.env.TSD_EMAIL_PASS
         }
     }));
     let mailOptions = {
-        from: 'tsdcapstone@gmail.com',
+        from: process.env.TSD_EMAIL_ADDRESS,
         to: student_email,
         subject: 'Requested Donation ID',
         text: message
@@ -64,12 +64,12 @@ const emailAfterSubmitDonation = async (req,res) => {
         service: 'gmail',
         host: 'smtp.gmail.com',
         auth: {
-            user: 'tsdcapstone@gmail.com',
+            user: process.env.TSD_EMAIL_ADDRESS,
             pass: process.env.TSD_EMAIL_PASS
         }
     }));
     let mailOptions = {
-        from: 'tsdcapstone@gmail.com',
+        from: process.env.TSD_EMAIL_ADDRESS,
         to: student_email,
         subject: 'Donation Confirmation',
         text: message
