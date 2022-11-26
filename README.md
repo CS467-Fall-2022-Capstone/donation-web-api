@@ -15,6 +15,7 @@ PORT=3000  # For local development
 MONGODB_URI=mongodb+srv://<username>:<password>@cluster1.hmltzxa.mongodb.net/DonationDB?retryWrites=true&w=majority
 JWT_SECRET=<Your Secret>
 JWT_ALGO=<Your Algo>
+TSD_EMAIL_ADDRESS=<Email address, must be a GMail address>
 TSD_EMAIL_PASS=<Your email account password>
 ```
 Replace `<username>` and `<password>` in the `MONGODB_URI` string with your database credentials.
