@@ -63,7 +63,7 @@ const bulkWriteDonations = async (req, res) => {
     ); // array of insertOne and updateOne operations
     const result = await Donation.bulkWrite(donationBulkOperations);
     if (result.insertedCount > 0) {
-        const newDonations = result.getInsertedIds;
+        const newDonations = result.getInsertedIds();
         const newDonationIds = newDonations.map((donation) => {
             if (donation) {
                 return donation._id;
