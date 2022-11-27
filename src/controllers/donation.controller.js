@@ -62,8 +62,8 @@ const bulkWriteDonations = async (req, res) => {
         createBulkWriteOperation
     ); // array of insertOne and updateOne operations
     const result = await Donation.bulkWrite(donationBulkOperations);
-    const newDonations = result.getInsertedIds();
-    if (newDonations.length > 0) {
+    if (result.insertedCount > 0) {
+        const newDonations = result.getInsertedIds;
         const newDonationIds = newDonations.map((donation) => {
             if (donation) {
                 return donation._id;
@@ -141,7 +141,6 @@ const createBulkWriteOperation = (item) => {
  * that came in
  */
 const donationByID = async (req, res, next, id) => {
-    console.log(req.id);
     try {
         let donation = await Donation.findById(id);
         if (!donation) {
@@ -163,9 +162,7 @@ const donationByID = async (req, res, next, id) => {
 };
 
 const create = async (req, res) => {
-    console.log('inside create');
     try {
-        console.log(req.body);
         let student = await Student.findById(req.body.student_id);
         let student_id = student._id;
         let supply = await Supply.findById(req.body.supply_id);
@@ -176,9 +173,7 @@ const create = async (req, res) => {
             supply_id,
             quantityDonated: req.body.quantityDonated,
         };
-        console.log(donationBody);
         const donation = await Donation.create(donationBody);
-        console.log(donation);
 
         student.donations.push(donation._id);
         await student.save();
@@ -194,7 +189,6 @@ const create = async (req, res) => {
 };
 
 const read = (req, res) => {
-    console.log(req.donation);
     return res.json(req.donation.toJSON());
 };
 

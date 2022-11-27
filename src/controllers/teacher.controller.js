@@ -110,7 +110,6 @@ const read = async (req, res, next) => {
             supplyWithDonations: donatedTotals.length,
         };
         // return completed Teacher data and total donations grouped by supplyId
-        console.log(completeTeacherData);
         res.status(200).json(completeTeacherData);
     } catch (err) {
         return res.status(400).json({
