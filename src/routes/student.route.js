@@ -13,14 +13,14 @@ router
 
 // Find student by donation code entered in modal form
 router
-    .route('/students/:donationCode/donations')
-    .get(studentCtrl.studentByDonationCode)
+    .route('/students/donation_code/:donationCode')
+    .get(studentCtrl.studentByDonationCode);
 
 /**
-* Preloads user into the Express req object BEFORE
-* propogating to the next function thats specific to the request
-* that came in
-*/
+ * Preloads user into the Express req object BEFORE
+ * propogating to the next function thats specific to the request
+ * that came in
+ */
 router.param('studentId', studentCtrl.studentByID);
 
 export default router;

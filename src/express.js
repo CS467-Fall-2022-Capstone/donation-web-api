@@ -16,11 +16,9 @@ app.use(
         extended: true,
     })
 );
-app.use(
-    cors({
-        origin: '*',
-    })
-);
+
+// Allow all origins
+app.use(cors());
 
 app.use(passport.initialize());
 
@@ -37,6 +35,7 @@ app.get('/', (req, res) =>
 );
 
 app.get('/ping', (req, res) => {
+    // Health Check
     const serverUp = { status: true };
     res.status(200).json(serverUp);
 });
