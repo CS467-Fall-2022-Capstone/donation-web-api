@@ -5,14 +5,16 @@ const router = express.Router();
 
 router.route('/students').post(studentCtrl.create);
 
-// Find student by donation code entered in modal form
-router.route('/students/:donationCode').get(studentCtrl.studentByDonationCode);
-
 router
     .route('/students/:studentId')
     .get(studentCtrl.read)
     .patch(studentCtrl.update)
     .delete(studentCtrl.remove);
+
+// Find student by donation code entered in modal form
+router
+    .route('/students/donation_code/:donationCode')
+    .get(studentCtrl.studentByDonationCode);
 
 /**
  * Preloads user into the Express req object BEFORE
