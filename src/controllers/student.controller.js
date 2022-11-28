@@ -99,17 +99,16 @@ const remove = async (req, res, next) => {
     }
 };
 
-const studentByDonationCode = async (req, res) => {
-    // find Student by donation code
-    console.log(req);
-    const donationCode = req.params.donationCode;
-    const student = await Student.findOne({
-        donation_code: donationCode,
-    }).exec();
-    if (student) {
-        console.log(student);
-        return res.status(200).json({ student_id: student._id });
-    } else {
+const studentByDonationCode = async (req, res, next) => {
+    try {
+        // find Student by donation code
+        console.log(req.params);
+        const donationCode = req.params.donationCode;
+        const student = await Student.findOne({
+            donation_code: donationCode,
+        });
+        return res.status(200).json({ student_id: student._id.toString() });
+    } catch (err) {
         return res.status(400).json({
             error: errorHandler.getErrorMessage(err),
         });

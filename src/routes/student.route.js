@@ -6,9 +6,7 @@ const router = express.Router();
 router.route('/students').post(studentCtrl.create);
 
 // Find student by donation code entered in modal form
-router
-    .route('/students/:donationCode/donations')
-    .get(studentCtrl.studentByDonationCode);
+router.route('/students/:donationCode').get(studentCtrl.studentByDonationCode);
 
 router
     .route('/students/:studentId')
